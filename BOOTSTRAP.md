@@ -11,7 +11,7 @@ The repository must be sufficient to reconstruct operational context without acc
 Before performing significant project work, the agent MUST:
 
 1. Read `AGENTS.md`.
-2. Read `governance/SPECIFICATION.md` when needed to resolve normative detail, authority, ambiguity, or conflict.
+2. Read `governance/specification.md` when needed to resolve normative detail, authority, ambiguity, or conflict.
 3. Read `state/current.yaml` to establish the current project baseline, status, open work, and next actions.
 4. Read active approved requirements under `requirements/` relevant to the current task.
 5. Read active approved decisions under `decisions/` relevant to the current task.
