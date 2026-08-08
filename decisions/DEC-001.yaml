@@ -4,7 +4,7 @@ title: "Adopt AI governance V1.0 as repository baseline"
 date: "2026-08-08"
 problem: "The repository needs an explicit approved governance baseline so that AI agents can operate against a persistent, reconstructible set of rules."
 context: "The governance specification, core agent rules, authority model, knowledge policy, response protocol, invariants, schemas, templates, validator, tests, and CI have been established as the initial framework."
-options:
+alternatives:
   - "Adopt governance V1.0 as the current operational baseline."
   - "Keep the framework provisional and without an approved baseline."
 decision: "Adopt governance V1.0 as the current operational baseline of this repository."
@@ -20,6 +20,6 @@ affected_items:
   - "governance/response-protocol.md"
   - "governance/invariants.md"
 supersedes: []
-superseded_by: ""
+superseded_by: null
 evidence:
   - "Explicit user approval on 2026-08-08."
