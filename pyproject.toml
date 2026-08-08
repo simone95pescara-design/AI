@@ -18,8 +18,9 @@ test = [
   "pytest>=8.0,<9",
 ]
 
-[tool.setuptools]
-packages = []
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["ai_governance*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
