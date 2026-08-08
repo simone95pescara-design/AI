@@ -1,7 +1,7 @@
 """Application service for structural JSON Schema validation.
 
-This module validates artifact structure against the active technical schemas.
-It does not evaluate governance invariants or semantic relationships.
+This module validates artifact structure against schema data supplied by callers.
+It does not read the repository, evaluate governance invariants or semantic relationships.
 """
 
 from __future__ import annotations
@@ -11,8 +11,6 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from jsonschema import Draft202012Validator
-
-from ai_governance.infrastructure.document_io import load_json_schema
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,26 +22,25 @@ class SchemaIssue:
     message: str
 
 
-def validate_schema_definition(path: Path) -> list[str]:
-    """Return structural problems in a JSON Schema definition."""
+def validate_schema_definition(schema: dict[str, Any]) -> list[str]:
+    """Return structural problems in one JSON Schema definition."""
 
     try:
-        data = load_json_schema(path)
-        Draft202012Validator.check_schema(data)
+        Draft202012Validator.check_schema(schema)
     except Exception as exc:
         return [str(exc)]
 
-    if data.get("type") != "object" or not data.get("required"):
+    if schema.get("type") != "object" or not schema.get("required"):
         return ["schema lacks object/required contract"]
     return []
 
 
-def build_validators(schema_paths: dict[str, Path]) -> dict[str, Draft202012Validator]:
+def build_validators(schemas: dict[str, dict[str, Any]]) -> dict[str, Draft202012Validator]:
     """Build validators for the currently active artifact kinds."""
 
     return {
-        kind: Draft202012Validator(load_json_schema(path))
-        for kind, path in schema_paths.items()
+        kind: Draft202012Validator(schema)
+        for kind, schema in schemas.items()
     }
 
 
