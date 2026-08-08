@@ -1,0 +1,14 @@
+id: QUEUE-001
+status: QUEUED
+title: "Autonomous software-development readiness matrix"
+created_at: "2026-08-08"
+reason: "Deferred until current repository inconsistencies, process gaps, and their root causes have been investigated and aligned."
+objective: "Define capability, prerequisite, maturity level R0-R4, acceptance test, automation potential, and required human gate for orderly semi-autonomous software development with minimal human intervention."
+prerequisites:
+  - "Complete current-system diagnostic and alignment work."
+  - "Identify root causes of observed state/process inconsistencies rather than only correcting symptoms."
+  - "Establish a reliable mechanism for detecting and recording drift, stale state, missed updates, and process failures."
+resume_when:
+  - "Diagnostic findings are recorded."
+  - "Material root causes are identified or explicitly marked UNKNOWN."
+  - "Required corrective actions are completed or placed under controlled tracking."
