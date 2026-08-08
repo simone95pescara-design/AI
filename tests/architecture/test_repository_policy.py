@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 from ai_governance.infrastructure.repository_registry import REQUIRED_PATHS
@@ -36,78 +37,96 @@ LEGACY_OPERATIONAL_PATHS = (
 )
 
 
+def tracked_paths(pattern: str | None = None) -> list[Path]:
+    command = ["git", "ls-files"]
+    if pattern is not None:
+        command.extend(["--", pattern])
+    result = subprocess.run(
+        command,
+        cwd=REPO,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return [Path(line) for line in result.stdout.splitlines() if line]
+
+
 def test_application_python_is_owned_by_src() -> None:
     violations = []
-    for path in REPO.rglob("*.py"):
-        relative = path.relative_to(REPO)
+    for relative in tracked_paths("*.py"):
         if relative.parts[0] not in {"src", "tests"}:
             violations.append(str(relative))
     assert violations == []
 
 
 def test_only_root_readme_is_allowed() -> None:
-    readmes = sorted(path.relative_to(REPO) for path in REPO.rglob("README.md"))
+    readmes = sorted(path for path in tracked_paths() if path.name == "README.md")
     assert readmes == [Path("README.md")]
 
 
 def test_repository_top_level_directory_names_are_deterministic() -> None:
+    top_level_dirs = {path.parts[0] for path in tracked_paths() if len(path.parts) > 1}
     violations = []
-    for path in REPO.iterdir():
-        if not path.is_dir() or path.name == ".git":
+    for name in sorted(top_level_dirs):
+        if name == ".github":
             continue
-        if path.name == ".github":
-            continue
-        if not TOP_LEVEL_DIR.fullmatch(path.name):
-            violations.append(path.name)
+        if not TOP_LEVEL_DIR.fullmatch(name):
+            violations.append(name)
     assert violations == []
 
 
 def test_human_document_names_follow_policy() -> None:
     violations = []
-    for owner in (REPO / "governance", REPO / "docs"):
-        for path in owner.glob("*.md"):
-            if not KEBAB_MD.fullmatch(path.name):
-                violations.append(str(path.relative_to(REPO)))
+    for relative in tracked_paths():
+        if len(relative.parts) != 2 or relative.parts[0] not in {"governance", "docs"}:
+            continue
+        if relative.suffix == ".md" and not KEBAB_MD.fullmatch(relative.name):
+            violations.append(str(relative))
     assert violations == []
 
 
 def test_schema_template_and_persistent_artifact_names_follow_policy() -> None:
     violations = []
 
-    for path in (REPO / "schemas").glob("*.schema.json"):
-        if not SCHEMA_NAME.fullmatch(path.name):
-            violations.append(str(path.relative_to(REPO)))
-
-    for path in (REPO / "templates").glob("*.yaml"):
-        if not TEMPLATE_NAME.fullmatch(path.name):
-            violations.append(str(path.relative_to(REPO)))
+    for relative in tracked_paths():
+        if len(relative.parts) != 2:
+            continue
+        directory = relative.parts[0]
+        if directory == "schemas" and relative.name.endswith(".schema.json"):
+            if not SCHEMA_NAME.fullmatch(relative.name):
+                violations.append(str(relative))
+        elif directory == "templates" and relative.suffix == ".yaml":
+            if not TEMPLATE_NAME.fullmatch(relative.name):
+                violations.append(str(relative))
 
     artifact_patterns = {
         "decisions": re.compile(r"^DEC-\d{3}\.yaml$"),
         "requirements": re.compile(r"^REQ-\d{3}\.yaml$"),
         "risks": re.compile(r"^RISK-\d{3}\.yaml$"),
     }
-    for directory, pattern in artifact_patterns.items():
-        for path in (REPO / directory).glob("*.yaml"):
-            if not pattern.fullmatch(path.name):
-                violations.append(str(path.relative_to(REPO)))
+    for relative in tracked_paths():
+        if len(relative.parts) != 2:
+            continue
+        pattern = artifact_patterns.get(relative.parts[0])
+        if pattern and relative.suffix == ".yaml" and not pattern.fullmatch(relative.name):
+            violations.append(str(relative))
 
     assert violations == []
 
 
 def test_python_module_and_test_names_follow_policy() -> None:
     violations = []
-    for path in (REPO / "src" / "ai_governance").rglob("*.py"):
-        if path.name == "__init__.py":
-            continue
-        if not SNAKE_PY.fullmatch(path.name):
-            violations.append(str(path.relative_to(REPO)))
-
-    for path in (REPO / "tests").rglob("*.py"):
-        if path.name == "conftest.py":
-            continue
-        if not path.name.startswith("test_") or not SNAKE_PY.fullmatch(path.name):
-            violations.append(str(path.relative_to(REPO)))
+    for relative in tracked_paths("*.py"):
+        if relative.parts[0] == "src":
+            if relative.name == "__init__.py":
+                continue
+            if not SNAKE_PY.fullmatch(relative.name):
+                violations.append(str(relative))
+        elif relative.parts[0] == "tests":
+            if relative.name == "conftest.py":
+                continue
+            if not relative.name.startswith("test_") or not SNAKE_PY.fullmatch(relative.name):
+                violations.append(str(relative))
 
     assert violations == []
 
@@ -120,14 +139,12 @@ def test_required_bootstrap_and_normative_paths_are_explicit_and_present() -> No
 
 def test_pyproject_is_only_python_dependency_source() -> None:
     competing = []
-    for path in REPO.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
-            continue
-        name = path.name
+    for relative in tracked_paths():
+        name = relative.name
         if name in {"setup.py", "setup.cfg", "Pipfile"} or (
             name.startswith("requirements") and name.endswith(".txt")
         ):
-            competing.append(str(path.relative_to(REPO)))
+            competing.append(str(relative))
     assert competing == []
 
 
