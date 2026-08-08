@@ -1,5 +1,5 @@
 id: DEC-004
-status: PROPOSED
+status: APPROVED
 title: "Adopt Repository Engineering V1"
 date: "2026-08-08"
 problem: "The repository has accumulated governance documents, schemas, artifacts, tests and Python compliance code without an explicit enforceable repository architecture, canonical language/naming policy, Python package boundaries, dependency rules, or migration contract. Continued feature growth risks recreating the disorder the framework is intended to prevent."
@@ -8,7 +8,7 @@ alternatives:
   - "Continue incremental growth and refactor later."
   - "Define and approve an enforceable repository architecture, language/naming conventions, documentation taxonomy, Python boundaries, dependency direction, registry/error contracts, characterization tests and migration strategy before further functional expansion."
   - "Translate, rename or split current files immediately without first defining target architecture and equivalence criteria."
-decision: "PROPOSED: freeze functional expansion and adopt Repository Engineering V1 before refactoring, translating, renaming or extending governance software."
+decision: "APPROVED: freeze functional expansion and adopt Repository Engineering V1 before refactoring, translating, renaming or extending governance software."
 rationale: "Architecture, enforceable boundaries and behavior-equivalence criteria must precede migration; otherwise translation, renaming and refactoring risk being repeated or merely distributing the same coupling across more files."
 consequences:
   - "DEC-003 remains unapproved until repository-engineering alignment is reviewed."
@@ -32,5 +32,6 @@ superseded_by: null
 evidence:
   - "Repository Engineering Audit findings ENG-01..ENG-10 from 2026-08-08."
   - "Repository Engineering review findings RE-01..RE-20 from 2026-08-08."
+  - "Explicit human approval recorded in conversation on 2026-08-08."
   - "No README or pyproject.toml was found during the audit."
   - "compliance/validate.py currently combines parsing, schema validation, semantic validation, graph checks, secret scanning and CLI output."
