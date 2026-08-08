@@ -2,37 +2,19 @@ project: "AI Project Governance Framework"
 baseline: "Governance V1.0 + Transition Model V1 / DEC-001 + DEC-002"
 status: ACTIVE
 updated_at: "2026-08-08"
-completed:
-  - "Core governance files established."
-  - "Governance V1.0 explicitly approved and recorded as DEC-001."
-  - "Cold-start reconstructibility requirement REQ-001 verified as PASSED."
-  - "Self-bootstrapping requirement REQ-002 verified as PASSED."
-  - "Persistent verification record VER-001 created for REQ-001 and REQ-002."
-  - "Initial schemas, templates, compliance validator, governance tests, and GitHub Actions workflow established."
-  - "Pre-existing decision/requirement schema drift repaired through PR #2 with passing compliance."
-  - "Transition Model V1 approved as DEC-002 and promoted to main through PR #1 after passing compliance."
-in_progress:
-  - "TASK-003: investigate and align current repository/process inconsistencies before extending autonomous-development capabilities."
-  - "Apply TR-MODEL-EXTEND to verification, queue, diagnostic, task ownership, and state projection semantics."
-blocked: []
-open_issues:
-  - "governance/transition-model.md on main still labels itself APPROVED_CANDIDATE after promotion; this is a post-promotion projection defect and must not be interpreted as the normative state of DEC-002."
-  - "Existing VER-* and QUEUE-* instances predate formal metamodel activation and are non-authoritative until migrated or retired through TR-MODEL-EXTEND."
-  - "Task lifecycle ownership remains unresolved and task transitions are provisional."
-  - "Diagnostic lifecycle is normative at transition level but no diagnostic artifact type is yet MODEL_ACTIVE."
-  - "Autonomous-development readiness work remains deferred until diagnostic alignment is complete."
+active_tasks:
+  - TASK-003
+queued_work:
+  - QUEUE-001
+open_diagnostics:
+  - DIA-001
 next_actions:
-  - "Promote this state-alignment repair through PR and compliance."
-  - "Prepare a governed metamodel-extension candidate for verification, queue, diagnostic, task, and state projection ownership."
-  - "Do not treat new artifact types as authoritative before explicit A3 approval and baseline promotion."
+  - "Complete Operational Metamodel V1 candidate validation."
+  - "Obtain explicit A3 approval for DEC-003 before activation."
+  - "Promote the complete metamodel candidate only after compliance and migration checks pass."
 verification_status: PARTIAL
-tasks:
-  - id: "TASK-001"
-    status: DONE
-    verification_status: PASSED
-  - id: "TASK-002"
-    status: TODO
-    verification_status: UNKNOWN
-  - id: "TASK-003"
-    status: DOING
-    verification_status: PARTIAL
+notes:
+  - "TASK-001 is completed and verified by VER-001; its status is owned by tasks/TASK-001.yaml in this candidate model."
+  - "TASK-002 is cancelled as executable work because readiness is deliberately deferred in QUEUE-001."
+  - "Existing VER-001 and QUEUE-001 are migrated in this candidate but remain non-authoritative until DEC-003 is approved and promoted."
+  - "governance/transition-model.md still contains a stale APPROVED_CANDIDATE self-label; DEC-002 on baseline is authoritative for its approved status until a controlled document repair is promoted."
