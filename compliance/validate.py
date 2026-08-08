@@ -5,8 +5,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator
-
+from ai_governance.application.schema_validation import (
+    build_validators,
+    validate_artifact_documents,
+    validate_schema_definition,
+)
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
 from ai_governance.infrastructure.document_io import (
     load_document as infrastructure_load_document,
@@ -49,13 +52,15 @@ def load_schema(path: Path) -> dict[str, Any]:
 def check_schemas(errors: list[str]) -> None:
     for path in SCHEMAS.values():
         try:
-            data = load_schema(path)
-            Draft202012Validator.check_schema(data)
+            schema = load_schema(path)
         except Exception as exc:
             fail("CHECK-002", f"invalid schema {path.relative_to(REPO)}: {exc}", errors)
             continue
-        if data.get("type") != "object" or not data.get("required"):
-            fail("CHECK-002", f"schema lacks object/required contract: {path.relative_to(REPO)}", errors)
+        for issue in validate_schema_definition(schema):
+            if issue == "schema lacks object/required contract":
+                fail("CHECK-002", f"schema lacks object/required contract: {path.relative_to(REPO)}", errors)
+            else:
+                fail("CHECK-002", f"invalid schema {path.relative_to(REPO)}: {issue}", errors)
 
 
 def load_document(path: Path) -> Any:
@@ -74,24 +79,23 @@ def load_artifacts(errors: list[str]) -> list[tuple[str, Path, dict[str, Any]]]:
             errors,
         )
 
-    validators = {
-        kind: Draft202012Validator(load_schema(schema_path))
-        for kind, schema_path in SCHEMAS.items()
-    }
-
+    object_documents: list[tuple[str, Path, dict[str, Any]]] = []
     for artifact in loaded:
         kind, path, data = artifact.kind, artifact.path, artifact.data
         if not isinstance(data, dict):
             fail("CHECK-003", f"artifact must be an object: {path.relative_to(REPO)}", errors)
             continue
-        schema_errors = sorted(
-            validators[kind].iter_errors(data),
-            key=lambda item: list(item.absolute_path),
-        )
-        for err in schema_errors:
-            location = ".".join(str(part) for part in err.absolute_path) or "<root>"
-            fail("CHECK-003", f"{path.relative_to(REPO)} [{location}]: {err.message}", errors)
+        object_documents.append((kind, path, data))
         artifacts.append((kind, path, data))
+
+    schemas = {kind: load_schema(path) for kind, path in SCHEMAS.items()}
+    validators = build_validators(schemas)
+    for issue in validate_artifact_documents(object_documents, validators):
+        fail(
+            "CHECK-003",
+            f"{issue.path.relative_to(REPO)} [{issue.location}]: {issue.message}",
+            errors,
+        )
     return artifacts
 
 
