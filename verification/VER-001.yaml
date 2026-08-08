@@ -4,6 +4,12 @@ type: COLD_START
 date: "2026-08-08"
 baseline: "Governance V1.0 / DEC-001"
 method: "Fresh-conversation cold-start assessment using repository contents only."
+provenance:
+  target: "REQ-001 and REQ-002 cold-start/bootstrap behavior"
+  baseline_ref: "DEC-001 / repository main baseline at test time"
+  executor: "independent fresh AI conversation initiated by user"
+  executed_at: "2026-08-08"
+  reproducible_command: null
 requirements:
   - REQ-001
   - REQ-002
