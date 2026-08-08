@@ -1,5 +1,5 @@
 project: "AI Project Governance Framework"
-baseline: "Governance V1.0 / DEC-001"
+baseline: "Governance V1.0 + Transition Model V1 / DEC-001 + DEC-002"
 status: ACTIVE
 updated_at: "2026-08-08"
 completed:
@@ -9,18 +9,22 @@ completed:
   - "Self-bootstrapping requirement REQ-002 verified as PASSED."
   - "Persistent verification record VER-001 created for REQ-001 and REQ-002."
   - "Initial schemas, templates, compliance validator, governance tests, and GitHub Actions workflow established."
+  - "Pre-existing decision/requirement schema drift repaired through PR #2 with passing compliance."
+  - "Transition Model V1 approved as DEC-002 and promoted to main through PR #1 after passing compliance."
 in_progress:
-  - "Investigate and align current repository/process inconsistencies before extending autonomous-development capabilities."
+  - "TASK-003: investigate and align current repository/process inconsistencies before extending autonomous-development capabilities."
+  - "Apply TR-MODEL-EXTEND to verification, queue, diagnostic, task ownership, and state projection semantics."
 blocked: []
 open_issues:
-  - "The current system has not yet undergone a systematic diagnostic for drift, stale state, missed persistence, process inconsistencies, and root causes."
-  - "Observed inconsistencies must be investigated without assuming their cause in advance."
-  - "Autonomous-development readiness work is deferred in QUEUE-001 until diagnostic alignment is complete."
+  - "governance/transition-model.md on main still labels itself APPROVED_CANDIDATE after promotion; this is a post-promotion projection defect and must not be interpreted as the normative state of DEC-002."
+  - "Existing VER-* and QUEUE-* instances predate formal metamodel activation and are non-authoritative until migrated or retired through TR-MODEL-EXTEND."
+  - "Task lifecycle ownership remains unresolved and task transitions are provisional."
+  - "Diagnostic lifecycle is normative at transition level but no diagnostic artifact type is yet MODEL_ACTIVE."
+  - "Autonomous-development readiness work remains deferred until diagnostic alignment is complete."
 next_actions:
-  - "Inventory the current repository structure, normative artifacts, state, evidence, schemas, validator, tests, and workflow."
-  - "Compare declared governance with actual repository behavior and identify discrepancies."
-  - "Classify each finding as symptom, confirmed cause, hypothesis, unknown, or design gap."
-  - "For confirmed problems, identify both corrective action and preventive/root-cause action before closing them."
+  - "Promote this state-alignment repair through PR and compliance."
+  - "Prepare a governed metamodel-extension candidate for verification, queue, diagnostic, task, and state projection ownership."
+  - "Do not treat new artifact types as authoritative before explicit A3 approval and baseline promotion."
 verification_status: PARTIAL
 tasks:
   - id: "TASK-001"
@@ -31,4 +35,4 @@ tasks:
     verification_status: UNKNOWN
   - id: "TASK-003"
     status: DOING
-    verification_status: UNKNOWN
+    verification_status: PARTIAL
