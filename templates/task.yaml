@@ -1,0 +1,17 @@
+id: TASK-XXX
+status: TODO
+title: ""
+objective: ""
+scope: ""
+baseline: ""
+authority: A0
+owner: null
+dependencies: []
+blockers: []
+acceptance_criteria: []
+verification_status: UNKNOWN
+verification_refs: []
+queue_source: null
+related_requirements: []
+related_decisions: []
+next_action: null
