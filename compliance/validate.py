@@ -13,6 +13,7 @@ from ai_governance.application.schema_validation import (
 from ai_governance.domain.artifacts import Artifact
 from ai_governance.domain.invariants import (
     find_approved_decisions_without_rationale,
+    find_approved_requirements_without_verification_method,
     find_duplicate_ids,
 )
 from ai_governance.infrastructure.artifact_mapping import domain_artifact
@@ -168,8 +169,10 @@ def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> lis
                         fail("INV-007", f"decision {item_id} supersedes {predecessor}, but reciprocal supersession is not recorded", errors)
 
         if kind == "REQ":
-            if status == "APPROVED" and not nonempty(data.get("verification_method")):
-                fail("INV-005", f"approved requirement {item_id} has no verification_method ({rel})", errors)
+            requirement_artifact = Artifact(kind=kind, data=data, source=str(rel))
+            for finding in find_approved_requirements_without_verification_method([requirement_artifact]):
+                fail(finding.code, finding.message, errors)
+
             if status == "SUPERSEDED":
                 successor = data.get("superseded_by")
                 if not nonempty(successor):
