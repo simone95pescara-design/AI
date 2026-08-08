@@ -6,8 +6,7 @@ scope: "Governance drift, state ownership, transition enforcement, metamodel act
 baseline: "Governance V1.0 + Transition Model V1 / DEC-001 + DEC-002"
 authority: A3
 owner: "AI project lead role"
-dependencies:
-  - DEC-002
+dependencies: []
 blockers: []
 acceptance_criteria:
   - "Confirmed design/root-cause gaps are persisted with evidence."
