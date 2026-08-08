@@ -1,0 +1,25 @@
+id: TASK-003
+status: DOING
+title: "Diagnose and align repository/process inconsistencies"
+objective: "Investigate current repository and process inconsistencies, identify root causes without premature assumptions, and align the framework before autonomous-development readiness work resumes."
+scope: "Governance drift, state ownership, transition enforcement, metamodel activation, verification/queue/task/diagnostic semantics, and preventive controls."
+baseline: "Governance V1.0 + Transition Model V1 / DEC-001 + DEC-002"
+authority: A3
+owner: "AI project lead role"
+dependencies:
+  - DEC-002
+blockers: []
+acceptance_criteria:
+  - "Confirmed design/root-cause gaps are persisted with evidence."
+  - "Operational artifact ownership is resolved or explicitly left UNKNOWN."
+  - "Verification, queue, diagnostics, task lifecycle, and state projection are aligned through TR-MODEL-EXTEND or explicitly deferred."
+  - "Preventive controls exist for the drift classes found during the audit."
+verification_status: PARTIAL
+verification_refs: []
+queue_source: null
+related_requirements: []
+related_decisions:
+  - DEC-002
+  - DEC-003
+next_action: "Complete and review the Operational Metamodel V1 candidate; do not promote until DEC-003 is approved and compliance passes."
+cancellation_reason: null
