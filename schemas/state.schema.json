@@ -1,32 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ProjectState",
+  "title": "ProjectStateProjection",
   "type": "object",
-  "required": ["project", "baseline", "status", "updated_at", "next_actions", "verification_status"],
+  "required": ["project", "baseline", "status", "updated_at", "active_tasks", "queued_work", "open_diagnostics", "next_actions", "verification_status"],
   "properties": {
     "project": {"type": "string", "minLength": 1},
     "baseline": {"type": "string", "minLength": 1},
     "status": {"enum": ["ACTIVE", "PAUSED", "BLOCKED", "COMPLETED"]},
     "updated_at": {"type": "string"},
-    "completed": {"type": "array"},
-    "in_progress": {"type": "array"},
-    "blocked": {"type": "array"},
-    "open_issues": {"type": "array"},
-    "next_actions": {"type": "array"},
+    "active_tasks": {"type": "array", "items": {"type": "string", "pattern": "^TASK-[0-9]{3,}$"}},
+    "queued_work": {"type": "array", "items": {"type": "string", "pattern": "^QUEUE-[0-9]{3,}$"}},
+    "open_diagnostics": {"type": "array", "items": {"type": "string", "pattern": "^DIA-[0-9]{3,}$"}},
+    "next_actions": {"type": "array", "items": {"type": "string"}},
     "verification_status": {"enum": ["UNKNOWN", "PARTIAL", "PASSED", "FAILED"]},
-    "tasks": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "status", "verification_status"],
-        "properties": {
-          "id": {"type": "string", "minLength": 1},
-          "status": {"enum": ["TODO", "DOING", "BLOCKED", "DONE"]},
-          "verification_status": {"enum": ["UNKNOWN", "PARTIAL", "PASSED", "FAILED", "NOT_REQUIRED"]}
-        },
-        "additionalProperties": true
-      }
-    }
+    "notes": {"type": "array", "items": {"type": "string"}}
   },
   "additionalProperties": false
 }
