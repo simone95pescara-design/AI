@@ -32,10 +32,28 @@ Ogni handoff aperto deve identificare almeno stato corrente e prossimo passo.
 ## INV-010 — Configurazione baseline
 La configurazione dichiarata come baseline deve essere identificabile e versionata quando applicabile.
 
+## INV-011 — Evidenza di verifica
+Un artefatto `VER-*` con stato `PASSED` deve contenere evidenza non vuota attribuibile al target e alla baseline dichiarati.
+
+## INV-012 — Ownership del task attivo
+Un `TASK-*` in stato `DOING` deve avere ownership esplicita.
+
+## INV-013 — Promozione queue valida
+Un `QUEUE-*` in stato `PROMOTED` deve indicare tramite `promoted_to` un `TASK-*` esistente. La promozione non riutilizza l'identità QUEUE come identità TASK.
+
+## INV-014 — Diagnosi epistemicamente coerente
+Un `DIA-*` non può dichiarare una root cause confermata senza una causa esplicita; lo stato diagnostico e `root_cause_status` devono essere coerenti.
+
+## INV-015 — Proiezione di stato valida
+Gli ID dichiarati da `state/current.yaml` come task attivi, lavoro in queue o diagnostiche aperte devono risolvere rispettivamente a `TASK-*`, `QUEUE-*` e `DIA-*` esistenti.
+
+## INV-016 — Singola ownership della conoscenza
+Quando un fatto ha un owner artifact definito dal metamodel, una proiezione o un summary non può sostituirsi all'owner né contraddirlo. Il controllo automatico completo richiede ulteriori regole di derivazione e resta parzialmente implementato.
+
 ## Stato di automazione
 
-Attualmente il validator automatizza `INV-001`–`INV-008` per le porzioni tecnicamente rappresentabili nel modello dati corrente. `INV-009` e `INV-010` restano da implementare quando verranno introdotti handoff e configuration artifact formali.
+Nel candidate Operational Metamodel V1 il validator automatizza `INV-001`–`INV-008` per le porzioni già esistenti e `INV-011`–`INV-015` per VER/QUEUE/DIA/TASK/STATE. `INV-009`, `INV-010` e la parte generale di `INV-016` restano da implementare quando i relativi modelli e derivazioni saranno formalizzati.
 
 ## Evoluzione
 
-Una nuova regola automatizzabile dovrebbe essere aggiunta qui prima di implementarne il validator. Il codice di compliance non deve introdurre requisiti normativi non documentati.
+Una nuova regola automatizzabile deve essere documentata qui prima o nello stesso candidate change che ne implementa il validator. Il codice di compliance non deve introdurre requisiti normativi non documentati.
