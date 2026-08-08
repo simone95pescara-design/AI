@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectState",
+  "type": "object",
+  "required": ["project","baseline","status","updated_at","next_actions","verification_status"],
+  "properties": {
+    "project": {"type":"string","minLength":1},
+    "baseline": {"type":"string","minLength":1},
+    "status": {"enum":["ACTIVE","PAUSED","BLOCKED","COMPLETED"]},
+    "updated_at": {"type":"string"},
+    "completed": {"type":"array"},
+    "in_progress": {"type":"array"},
+    "blocked": {"type":"array"},
+    "open_issues": {"type":"array"},
+    "next_actions": {"type":"array"},
+    "verification_status": {"enum":["UNKNOWN","PARTIAL","PASSED","FAILED"]}
+  },
+  "additionalProperties": false
+}
