@@ -1,0 +1,37 @@
+id: DEC-002
+status: APPROVED
+title: "Adopt Transition Model V1 for governed state changes"
+date: "2026-08-08"
+problem: "Governance V1.0 defines many artifact states and behavioral constraints, but does not define a complete normative model for significant state transitions, promotion gates, metamodel evolution, diagnostic closure, and atomic side effects. This allows model drift, baseline contamination risk, ambiguous ownership, and repeated diagnosis gaps."
+context: "Repository audit identified RC-00: the framework governs states more completely than transitions. RC-01 (non-atomic metamodel evolution) and RC-02 (working state not technically separated from approved baseline) are confirmed downstream causes. H-03 (knowledge ownership ambiguity) remains only partially resolved and task ownership remains explicitly UNKNOWN. Review of the first draft also identified the need to separate human approval from baseline promotion, define transition composition/versioning, and make mandatory transition-contract fields explicit."
+alternatives:
+  - "Keep Governance V1.0 state-centric and address each failure mode with local rules."
+  - "Introduce a normative Transition Model V1 with explicit triggers, preconditions, authority, evidence, atomic effects, postconditions, failure behavior, rollback, persistence, audit, composition, and baseline promotion."
+  - "Replace the current governance framework entirely with an external workflow engine."
+decision: "Adopt Transition Model V1 as the normative mechanism for governance-significant state changes, subject to successful candidate compliance and promotion to the designated baseline branch."
+rationale: "A generic transition contract addresses the common architectural gap instead of correcting individual symptoms repeatedly. It provides a foundation for enforceable model evolution, candidate-to-baseline promotion, diagnosis lifecycle, and later semi-autonomous software delivery."
+consequences:
+  - "Governance-significant state changes will require explicit transition definitions."
+  - "New artifact types cannot become authoritative before metamodel activation criteria are satisfied."
+  - "Working changes, human approval, verification, and baseline promotion are treated as distinct events."
+  - "Diagnostic findings require an explicit closure outcome and residual unknowns remain visible."
+  - "Existing VER, QUEUE, state, and workflow artifacts require alignment after this decision is promoted to baseline."
+  - "Task transition rules remain non-enforceable until task knowledge ownership is decided."
+affected_items:
+  - "governance/SPECIFICATION.md"
+  - "governance/transition-model.md"
+  - "state/current.yaml"
+  - "compliance/validate.py"
+  - "schemas/"
+  - "templates/"
+  - "verification/"
+  - "queue/"
+supersedes: []
+superseded_by: null
+evidence:
+  - "Repository audit and transition coverage analysis performed on 2026-08-08."
+  - "Observed introduction of VER-* and QUEUE-* before full metamodel integration."
+  - "Observed direct writes to main without a mandatory candidate-to-baseline promotion gate."
+  - "PR #1 review findings TM-01 through TM-10 incorporated into the revised proposal."
+  - "PR #2 repaired pre-existing baseline schema drift and passed governance compliance before merge."
+  - "Explicit user approval of DEC-002 on 2026-08-08."
