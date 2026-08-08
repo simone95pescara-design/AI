@@ -129,10 +129,11 @@ def test_legacy_state_done_failed_contract():
 
 
 def test_legacy_secret_scanner_contract(tmp_path, monkeypatch):
+    fake_secret = "gh" + "p_" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456"
     secret_file = tmp_path / "sample.txt"
-    secret_file.write_text("ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ123456", encoding="utf-8")
+    secret_file.write_text(fake_secret, encoding="utf-8")
     ignored = tmp_path / "sample.bin"
-    ignored.write_text("ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ123456", encoding="utf-8")
+    ignored.write_text(fake_secret, encoding="utf-8")
 
     monkeypatch.setattr(validator, "REPO", tmp_path)
     errors = []
