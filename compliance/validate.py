@@ -51,8 +51,12 @@ def load_schema(path: Path) -> dict[str, Any]:
 
 def check_schemas(errors: list[str]) -> None:
     for path in SCHEMAS.values():
-        issues = validate_schema_definition(path)
-        for issue in issues:
+        try:
+            schema = load_schema(path)
+        except Exception as exc:
+            fail("CHECK-002", f"invalid schema {path.relative_to(REPO)}: {exc}", errors)
+            continue
+        for issue in validate_schema_definition(schema):
             if issue == "schema lacks object/required contract":
                 fail("CHECK-002", f"schema lacks object/required contract: {path.relative_to(REPO)}", errors)
             else:
@@ -84,7 +88,8 @@ def load_artifacts(errors: list[str]) -> list[tuple[str, Path, dict[str, Any]]]:
         object_documents.append((kind, path, data))
         artifacts.append((kind, path, data))
 
-    validators = build_validators(SCHEMAS)
+    schemas = {kind: load_schema(path) for kind, path in SCHEMAS.items()}
+    validators = build_validators(schemas)
     for issue in validate_artifact_documents(object_documents, validators):
         fail(
             "CHECK-003",
