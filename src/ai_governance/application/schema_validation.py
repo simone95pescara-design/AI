@@ -15,7 +15,7 @@ from jsonschema import Draft202012Validator
 
 @dataclass(frozen=True, slots=True)
 class SchemaIssue:
-    """One deterministic structural validation finding."""
+    """Compatibility result for one deterministic structural validation finding."""
 
     path: Path
     location: str
@@ -38,10 +38,7 @@ def validate_schema_definition(schema: dict[str, Any]) -> list[str]:
 def build_validators(schemas: dict[str, dict[str, Any]]) -> dict[str, Draft202012Validator]:
     """Build validators for the currently active artifact kinds."""
 
-    return {
-        kind: Draft202012Validator(schema)
-        for kind, schema in schemas.items()
-    }
+    return {kind: Draft202012Validator(schema) for kind, schema in schemas.items()}
 
 
 def validate_artifact_documents(
