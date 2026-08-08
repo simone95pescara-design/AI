@@ -7,16 +7,13 @@ completed:
   - "Governance V1.0 explicitly approved and recorded as DEC-001."
   - "Cold-start reconstructibility requirement recorded as REQ-001."
   - "Initial schemas, templates, compliance validator, governance tests, and GitHub Actions workflow established."
-in_progress:
-  - "End-to-end cold-start validation of REQ-001."
+  - "End-to-end cold-start validation of REQ-001 executed and recorded as PASSED in evidence/REQ-001-cold-start-2026-08-08.md."
+in_progress: []
 blocked: []
-open_issues:
-  - "A cold-start test has not yet been executed and recorded as evidence."
-next_actions:
-  - "Execute a cold-start review using only repository contents."
-  - "Record the result against REQ-001 acceptance criteria."
-verification_status: PARTIAL
+open_issues: []
+next_actions: []
+verification_status: PASSED
 tasks:
   - id: "TASK-001"
-    status: DOING
-    verification_status: PARTIAL
+    status: DONE
+    verification_status: PASSED
