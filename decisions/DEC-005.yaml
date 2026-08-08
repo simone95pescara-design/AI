@@ -1,0 +1,39 @@
+id: DEC-005
+status: APPROVED
+title: "Adopt Product Metamodel V2"
+date: "2026-08-08"
+problem: "The repository can now govern and validate its own project knowledge more cleanly, but it still lacks an authoritative minimal product/system metamodel capable of representing system structure, runtime behavior, traceability to implementation, and derivable change impact. The historical Operational Metamodel V1 mainly governs project work and cannot by itself determine what software should be built."
+context: "The metamodel readiness audit merged in PR #24 classified the historical PR #4 as useful input but insufficient for software derivation. Repository Engineering V1 is now implemented enough to support a new incremental model without returning to a monolithic validator or big-bang activation."
+alternatives:
+  - "Promote historical PR #4 and use TASK/VER/DIA/QUEUE as the primary model for autonomous software development."
+  - "Create many independent artifact types for capability, component, interface, data, event, command, state, transition, invariant, configuration and implementation mapping."
+  - "Adopt a minimal Product Metamodel V2 with only SYS and BEH as new persistent product owners, structured local elements, typed traceability, change impact analysis and incremental activation."
+decision: "APPROVED: adopt Product Metamodel V2 with SYS as the owner of system structure/boundary and BEH as the owner of observable/runtime behavior; keep implementation in source control with typed mapping; activate operational artifact types independently only when justified."
+rationale: "Two persistent product owners are sufficient to close the critical gap between requirements/decisions and implementation while avoiding artifact proliferation. Structured local identifiers allow component/interface/data/state/transition references without creating a file type for every modeling concept. Change impact analysis and cold-start reconstructibility provide objective evidence that the model can guide implementation."
+consequences:
+  - "SYS and BEH become the only approved new top-level product artifact types in the minimum V2 direction, subject to incremental technical activation."
+  - "Components, interfaces, data, configuration, commands, events, states, transitions, runtime invariants and failure/recovery are structured elements inside SYS/BEH unless a later decision proves independent ownership is necessary."
+  - "No IMP artifact type is introduced; implementation remains owned by code/config/tests and is referenced through typed mappings."
+  - "TASK must represent executable work derived from a sufficiently determined system delta rather than serving as an informal design container."
+  - "VER, TASK, DIA and QUEUE from the historical operational proposal are redesigned/activated incrementally rather than atomically."
+  - "The framework must support typed artifact/local-element references, change impact analysis and product cold-start reconstruction before SYS/BEH activation is considered complete."
+  - "A small trading-system vertical slice is used only as a completeness test before final activation."
+  - "PR #4 is superseded as a monolithic activation proposal; useful concepts may be redesigned and activated independently under Product Metamodel V2."
+affected_items:
+  - "governance/product-metamodel-v2.md"
+  - "schemas/"
+  - "templates/"
+  - "src/ai_governance/domain/"
+  - "src/ai_governance/application/"
+  - "src/ai_governance/infrastructure/"
+  - "tests/"
+  - "requirements/"
+  - "decisions/"
+  - "future SYS/BEH candidate artifacts"
+supersedes: []
+superseded_by: null
+evidence:
+  - "Explicit A3 approval by repository owner on 2026-08-08."
+  - "docs/metamodel-readiness-audit.md merged through PR #24."
+  - "Historical PR #4 Operational Metamodel V1 and its SYS-development gaps identified by audit."
+  - "Repository Engineering V1 / DEC-004 baseline and completed incremental validator refactoring."
