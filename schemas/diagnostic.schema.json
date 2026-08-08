@@ -17,6 +17,7 @@
     "preventive_actions": {"type": "array", "items": {"type": "string"}},
     "verification": {"type": "array", "items": {"type": "string"}},
     "residual_risk": {"type": "array", "items": {"type": "string"}},
+    "closure_reason": {"type": ["string", "null"]},
     "related_tasks": {"type": "array", "items": {"type": "string", "pattern": "^TASK-[0-9]{3,}$"}},
     "related_decisions": {"type": "array", "items": {"type": "string", "pattern": "^DEC-[0-9]{3,}$"}}
   },
