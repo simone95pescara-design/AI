@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
 from typing import Any
 
-import yaml
 from jsonschema import Draft202012Validator
+
+from ai_governance.infrastructure.document_io import (
+    load_document as infrastructure_load_document,
+    load_json_schema,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 REQUIRED = [
@@ -49,7 +52,8 @@ def check_required_files(errors: list[str]) -> None:
 
 
 def load_schema(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    """Compatibility wrapper around the infrastructure schema loader."""
+    return load_json_schema(path)
 
 
 def check_schemas(errors: list[str]) -> None:
@@ -65,10 +69,8 @@ def check_schemas(errors: list[str]) -> None:
 
 
 def load_document(path: Path) -> Any:
-    text = path.read_text(encoding="utf-8")
-    if path.suffix.lower() == ".json":
-        return json.loads(text)
-    return yaml.safe_load(text)
+    """Compatibility wrapper around the infrastructure document loader."""
+    return infrastructure_load_document(path)
 
 
 def load_artifacts(errors: list[str]) -> list[tuple[str, Path, dict[str, Any]]]:
