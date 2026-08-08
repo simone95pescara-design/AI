@@ -1,25 +1,17 @@
 """Application service for structural JSON Schema validation.
 
-This module validates artifact structure against schema data supplied by callers.
+This module validates domain artifacts against schema data supplied by callers.
 It does not read the repository, evaluate governance invariants or semantic relationships.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Iterable
 
 from jsonschema import Draft202012Validator
 
-
-@dataclass(frozen=True, slots=True)
-class SchemaIssue:
-    """Compatibility result for one deterministic structural validation finding."""
-
-    path: Path
-    location: str
-    message: str
+from ai_governance.domain.artifacts import Artifact
+from ai_governance.domain.findings import Finding
 
 
 def validate_schema_definition(schema: dict[str, Any]) -> list[str]:
@@ -41,19 +33,26 @@ def build_validators(schemas: dict[str, dict[str, Any]]) -> dict[str, Draft20201
     return {kind: Draft202012Validator(schema) for kind, schema in schemas.items()}
 
 
-def validate_artifact_documents(
-    documents: Iterable[tuple[str, Path, dict[str, Any]]],
+def validate_artifacts(
+    artifacts: Iterable[Artifact],
     validators: dict[str, Draft202012Validator],
-) -> list[SchemaIssue]:
-    """Return deterministic structural issues for parsed artifact objects."""
+) -> list[Finding]:
+    """Return deterministic structural findings for domain artifacts."""
 
-    issues: list[SchemaIssue] = []
-    for kind, path, data in documents:
+    findings: list[Finding] = []
+    for artifact in artifacts:
         schema_errors = sorted(
-            validators[kind].iter_errors(data),
+            validators[artifact.kind].iter_errors(artifact.data),
             key=lambda item: list(item.absolute_path),
         )
         for error in schema_errors:
             location = ".".join(str(part) for part in error.absolute_path) or "<root>"
-            issues.append(SchemaIssue(path=path, location=location, message=error.message))
-    return issues
+            findings.append(
+                Finding(
+                    code="CHECK-003",
+                    source=artifact.source,
+                    location=location,
+                    message=error.message,
+                )
+            )
+    return findings

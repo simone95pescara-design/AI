@@ -7,9 +7,10 @@ from typing import Any
 
 from ai_governance.application.schema_validation import (
     build_validators,
-    validate_artifact_documents,
+    validate_artifacts,
     validate_schema_definition,
 )
+from ai_governance.infrastructure.artifact_mapping import domain_artifact
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
 from ai_governance.infrastructure.document_io import (
     load_document as infrastructure_load_document,
@@ -79,23 +80,23 @@ def load_artifacts(errors: list[str]) -> list[tuple[str, Path, dict[str, Any]]]:
             errors,
         )
 
-    object_documents: list[tuple[str, Path, dict[str, Any]]] = []
-    for artifact in loaded:
-        kind, path, data = artifact.kind, artifact.path, artifact.data
+    domain_artifacts = []
+    for loaded_artifact in loaded:
+        kind, path, data = loaded_artifact.kind, loaded_artifact.path, loaded_artifact.data
         if not isinstance(data, dict):
             fail("CHECK-003", f"artifact must be an object: {path.relative_to(REPO)}", errors)
             continue
-        object_documents.append((kind, path, data))
+        domain_artifacts.append(
+            domain_artifact(kind=kind, path=path, data=data, repository_root=REPO)
+        )
         artifacts.append((kind, path, data))
 
     schemas = {kind: load_schema(path) for kind, path in SCHEMAS.items()}
     validators = build_validators(schemas)
-    for issue in validate_artifact_documents(object_documents, validators):
-        fail(
-            "CHECK-003",
-            f"{issue.path.relative_to(REPO)} [{issue.location}]: {issue.message}",
-            errors,
-        )
+    for finding in validate_artifacts(domain_artifacts, validators):
+        source = finding.source or "<unknown>"
+        location = finding.location or "<root>"
+        fail("CHECK-003", f"{source} [{location}]: {finding.message}", errors)
     return artifacts
 
 
