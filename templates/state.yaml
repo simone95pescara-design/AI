@@ -8,3 +8,7 @@ blocked: []
 open_issues: []
 next_actions: []
 verification_status: UNKNOWN
+tasks:
+  - id: TASK-001
+    status: TODO
+    verification_status: UNKNOWN
