@@ -15,6 +15,7 @@ from ai_governance.domain.artifacts import Artifact
 from ai_governance.domain.invariants import (
     find_approved_decisions_without_rationale,
     find_approved_requirements_without_verification_method,
+    find_done_tasks_with_failed_verification,
     find_duplicate_ids,
     find_invalid_supersession_successors,
     find_missing_requirement_references,
@@ -157,10 +158,8 @@ def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> lis
             for finding in find_invalid_supersession_successors([current_artifact], artifact_index):
                 fail(finding.code, finding.message, errors)
 
-        if kind == "STATE":
-            for task in data.get("tasks", []) or []:
-                if task.get("status") == "DONE" and task.get("verification_status") == "FAILED":
-                    fail("INV-004", f"task {task.get('id', '<unknown>')} is DONE with FAILED verification ({rel})", errors)
+        for finding in find_done_tasks_with_failed_verification([current_artifact]):
+            fail(finding.code, finding.message, errors)
 
         for finding in find_missing_requirement_references([current_artifact], artifact_index):
             fail(finding.code, finding.message, errors)
