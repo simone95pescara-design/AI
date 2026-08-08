@@ -17,6 +17,7 @@ from ai_governance.domain.invariants import (
     find_approved_requirements_without_verification_method,
     find_duplicate_ids,
     find_invalid_supersession_successors,
+    find_nonreciprocal_decision_supersessions,
 )
 from ai_governance.infrastructure.artifact_mapping import domain_artifact
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
@@ -160,14 +161,8 @@ def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> lis
                 fail(finding.code, finding.message, errors)
             for finding in find_invalid_supersession_successors([current_artifact], artifact_index):
                 fail(finding.code, finding.message, errors)
-
-            for predecessor in data.get("supersedes", []) or []:
-                if predecessor not in indexed or indexed[predecessor][0] != "DEC":
-                    fail("INV-007", f"decision {item_id} supersedes missing decision {predecessor} ({rel})", errors)
-                else:
-                    old = indexed[predecessor][2]
-                    if old.get("status") != "SUPERSEDED" or old.get("superseded_by") != item_id:
-                        fail("INV-007", f"decision {item_id} supersedes {predecessor}, but reciprocal supersession is not recorded", errors)
+            for finding in find_nonreciprocal_decision_supersessions([current_artifact], artifact_index):
+                fail(finding.code, finding.message, errors)
 
         if kind == "REQ":
             for finding in find_approved_requirements_without_verification_method([current_artifact]):
