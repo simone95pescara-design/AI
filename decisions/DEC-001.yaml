@@ -14,7 +14,7 @@ consequences:
   - "Agents must use the repository governance as persistent project knowledge."
 affected_items:
   - "AGENTS.md"
-  - "governance/SPECIFICATION.md"
+  - "governance/specification.md"
   - "governance/authority.md"
   - "governance/knowledge-policy.md"
   - "governance/response-protocol.md"

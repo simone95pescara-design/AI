@@ -20,12 +20,19 @@ class ArtifactTypeConfig:
 
 
 REQUIRED_PATHS: tuple[Path, ...] = (
+    Path("README.md"),
     Path("AGENTS.md"),
-    Path("governance/SPECIFICATION.md"),
+    Path("BOOTSTRAP.md"),
+    Path("pyproject.toml"),
+    Path("governance/specification.md"),
     Path("governance/authority.md"),
     Path("governance/knowledge-policy.md"),
     Path("governance/response-protocol.md"),
     Path("governance/invariants.md"),
+    Path("governance/transition-model.md"),
+    Path("governance/repository-engineering.md"),
+    Path("governance/product-metamodel-v2.md"),
+    Path("state/current.yaml"),
 )
 
 ARTIFACT_TYPES: dict[str, ArtifactTypeConfig] = {

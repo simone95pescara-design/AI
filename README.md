@@ -23,38 +23,43 @@ Per un agente AI:
 
 - `AGENTS.md` — istruzioni minime per agenti AI.
 - `BOOTSTRAP.md` — sequenza di cold-start e ricostruzione.
-- `governance/SPECIFICATION.md` — specifica di governance.
+- `governance/specification.md` — specifica di governance.
 - `governance/transition-model.md` — modello normativo delle transizioni.
 - `governance/repository-engineering.md` — architettura e convenzioni di repository/software.
+- `governance/product-metamodel-v2.md` — direzione approvata del metamodel di prodotto; `SYS/BEH` non sono ancora artifact type attivi.
 - `decisions/` — decisioni persistenti.
 - `requirements/` — requisiti persistenti.
 - `state/current.yaml` — proiezione sintetica dello stato corrente; non sostituisce gli owner autoritativi dei singoli fatti.
-- `schemas/` e `templates/` — contratti machine-readable e modelli degli artefatti attivi.
-- `tests/` — test di governance e characterization dell'implementazione legacy.
+- `schemas/` e `templates/` — contratti machine-readable e modelli degli artefatti attivi/candidate secondo il registry e i test.
+- `tests/` — unit, integration, architecture, governance e characterization test.
 
 ## Stato dell'ingegnerizzazione
 
-`DEC-004` stabilisce che l'espansione funzionale resta subordinata al riallineamento ingegneristico del repository. La migrazione deve essere incrementale e behavior-preserving: characterization test, packaging e struttura, refactoring controllato del validator e, solo dopo, normalizzazione documentale e naming.
-
-Lo stato operativo corrente non viene duplicato qui: usare `state/current.yaml` e gli artefatti autoritativi.
+`DEC-004` mantiene congelata l'espansione funzionale finché Repository Engineering V1 non supera il proprio exit gate. Lo stato operativo corrente non viene duplicato qui: usare `state/current.yaml` e `docs/repository-closure-audit.md`.
 
 ## Python
 
-La configurazione Python canonica è `pyproject.toml`.
+La configurazione Python canonica e unica source of truth per packaging e dipendenze è `pyproject.toml`.
 
-Durante la fase transitoria il validator legacy resta eseguibile con:
-
-```bash
-python compliance/validate.py
-```
-
-I test correnti possono essere eseguiti con:
+Installazione locale con dipendenze di test:
 
 ```bash
-python -m pytest tests/governance tests/characterization
+python -m pip install ".[test]"
 ```
 
-La futura API/CLI del package `ai_governance` verrà introdotta durante la migrazione architetturale; il vecchio script non deve essere trattato come API stabile.
+Compliance canonica:
+
+```bash
+ai-governance-compliance
+```
+
+Suite completa usata dalla CI:
+
+```bash
+python -m pytest tests/unit tests/governance tests/characterization tests/architecture tests/integration
+```
+
+Il package `ai_governance` è ancora interno: la versione `0.1.0` non dichiara un'API pubblica stabile.
 
 ## Principi di modifica
 

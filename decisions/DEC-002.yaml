@@ -18,7 +18,7 @@ consequences:
   - "Existing VER, QUEUE, state, and workflow artifacts require alignment after this decision is promoted to baseline."
   - "Task transition rules remain non-enforceable until task knowledge ownership is decided."
 affected_items:
-  - "governance/SPECIFICATION.md"
+  - "governance/specification.md"
   - "governance/transition-model.md"
   - "state/current.yaml"
   - "compliance/validate.py"
