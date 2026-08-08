@@ -7,26 +7,34 @@ from ai_governance.application.schema_validation import (
 )
 
 
-def test_validate_schema_definition_accepts_object_schema(tmp_path: Path) -> None:
-    schema = tmp_path / "schema.json"
-    schema.write_text('{"type":"object","required":["id"],"properties":{"id":{"type":"string"}}}', encoding="utf-8")
+def test_validate_schema_definition_accepts_object_schema() -> None:
+    schema = {
+        "type": "object",
+        "required": ["id"],
+        "properties": {"id": {"type": "string"}},
+    }
 
     assert validate_schema_definition(schema) == []
 
 
-def test_validate_schema_definition_rejects_missing_required_contract(tmp_path: Path) -> None:
-    schema = tmp_path / "schema.json"
-    schema.write_text('{"type":"object","properties":{"id":{"type":"string"}}}', encoding="utf-8")
+def test_validate_schema_definition_rejects_missing_required_contract() -> None:
+    schema = {
+        "type": "object",
+        "properties": {"id": {"type": "string"}},
+    }
 
     assert validate_schema_definition(schema) == ["schema lacks object/required contract"]
 
 
 def test_validate_artifact_documents_preserves_location_and_message(tmp_path: Path) -> None:
-    schema = tmp_path / "schema.json"
-    schema.write_text(
-        '{"type":"object","required":["id"],"properties":{"id":{"type":"string"},"status":{"type":"string"}}}',
-        encoding="utf-8",
-    )
+    schema = {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+            "id": {"type": "string"},
+            "status": {"type": "string"},
+        },
+    }
     validators = build_validators({"REQ": schema})
     artifact_path = tmp_path / "REQ-001.yaml"
     issues = validate_artifact_documents(
