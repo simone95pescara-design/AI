@@ -1,0 +1,15 @@
+id: VER-001
+type: COLD_START
+status: PASSED
+date: "2026-08-08"
+baseline: "Governance V1.0 / DEC-001"
+requirements:
+  - REQ-001
+  - REQ-002
+evidence:
+  - "evidence/REQ-001-cold-start-2026-08-08.md"
+  - "evidence/REQ-002-bootstrap-2026-08-08.md"
+summary: "Cold-start reconstruction and self-bootstrap were both successfully demonstrated using repository contents without prior conversation context."
+limitations:
+  - "This verification covers bootstrap and reconstructibility only; it does not establish readiness for autonomous software development."
+result: PASSED
