@@ -14,7 +14,7 @@ from ai_governance.infrastructure.post_promotion_snapshot import (
 
 
 def main(repository_root: Path | None = None) -> int:
-    root = repository_root or Path(__file__).resolve().parents[3]
+    root = (repository_root or Path.cwd()).resolve()
     document_paths = tuple(rule.path for rule in BASELINE_DOCUMENT_RULES)
     documents, current_state, approved_decision_ids = load_post_promotion_snapshot(
         root, document_paths
