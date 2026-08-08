@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Risk",
+  "type": "object",
+  "required": ["id","status","title","description","probability","impact"],
+  "properties": {
+    "id": {"type":"string","pattern":"^RISK-[0-9]{3,}$"},
+    "status": {"enum":["OPEN","MITIGATED","ACCEPTED","CLOSED"]},
+    "title": {"type":"string","minLength":1},
+    "description": {"type":"string","minLength":1},
+    "probability": {"enum":["LOW","MEDIUM","HIGH"]},
+    "impact": {"enum":["LOW","MEDIUM","HIGH","CRITICAL"]},
+    "mitigation": {"type":"string"},
+    "owner": {"type":"string"},
+    "related_items": {"type":"array"}
+  },
+  "additionalProperties": false
+}
