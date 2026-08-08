@@ -23,7 +23,7 @@ Per un agente AI:
 
 - `AGENTS.md` — istruzioni minime per agenti AI.
 - `BOOTSTRAP.md` — sequenza di cold-start e ricostruzione.
-- `governance/SPECIFICATION.md` — specifica di governance.
+- `governance/specification.md` — specifica di governance.
 - `governance/transition-model.md` — modello normativo delle transizioni.
 - `governance/repository-engineering.md` — architettura e convenzioni di repository/software.
 - `decisions/` — decisioni persistenti.
