@@ -1,0 +1,20 @@
+id: REQ-001
+status: APPROVED
+title: "Cold-start project reconstructibility"
+source: "Derived from the approved governance baseline and the project objective confirmed by the user."
+requirement: "A new AI agent without access to prior conversations must be able to reconstruct the repository's purpose, current governance baseline, authoritative rules, approved decisions, current state, open work, and next action using only repository contents."
+rationale: "The repository must carry the persistent project knowledge needed for continuity across AI instances and humans."
+constraints:
+  - "Prior chat history must not be required."
+  - "Authoritative information must be identifiable from repository contents."
+acceptance_criteria:
+  - "A cold-start agent identifies governance V1.0 as the current approved baseline."
+  - "A cold-start agent identifies DEC-001 and REQ-001."
+  - "A cold-start agent can state the current project status and next action from state/current.yaml."
+  - "The agent can distinguish normative repository information from temporary conversation context."
+verification_method: "Run a cold-start review with a fresh AI context using only repository contents and compare its answers against the acceptance criteria."
+dependencies:
+  - "DEC-001"
+related_decisions:
+  - "DEC-001"
+superseded_by: ""
