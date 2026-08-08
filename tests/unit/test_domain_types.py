@@ -34,10 +34,16 @@ def test_finding_is_transport_neutral_structured_result() -> None:
     finding = Finding(
         code="SCHEMA-STRUCTURE",
         message="id must be a string",
+        severity="ERROR",
         source="requirements/REQ-001.yaml",
         location="id",
+        rule="schema-validation",
+        context={"expected_type": "string"},
     )
 
     assert finding.code == "SCHEMA-STRUCTURE"
+    assert finding.severity == "ERROR"
     assert finding.source == "requirements/REQ-001.yaml"
     assert finding.location == "id"
+    assert finding.rule == "schema-validation"
+    assert finding.context == {"expected_type": "string"}
