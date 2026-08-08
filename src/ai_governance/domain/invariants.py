@@ -37,6 +37,33 @@ def find_approved_decisions_without_rationale(
     return findings
 
 
+def find_approved_requirements_without_verification_method(
+    artifacts: Iterable[Artifact],
+) -> list[Finding]:
+    """Return INV-005 findings for approved requirements without verification method."""
+
+    findings: list[Finding] = []
+    for artifact in artifacts:
+        if artifact.kind != "REQ" or artifact.data.get("status") != "APPROVED":
+            continue
+        if _nonempty_text(artifact.data.get("verification_method")):
+            continue
+
+        source = artifact.source or "<unknown>"
+        item_id = artifact.artifact_id or source
+        findings.append(
+            Finding(
+                code="INV-005",
+                message=(
+                    f"approved requirement {item_id} has no verification_method ({source})"
+                ),
+                source=source,
+                location="verification_method",
+            )
+        )
+    return findings
+
+
 def find_duplicate_ids(artifacts: Iterable[Artifact]) -> list[Finding]:
     """Return INV-006 findings for duplicate persistent IDs.
 
