@@ -4,6 +4,7 @@ from ai_governance.domain.invariants import (
     find_approved_requirements_without_verification_method,
     find_duplicate_ids,
     find_invalid_supersession_successors,
+    find_nonreciprocal_decision_supersessions,
 )
 
 
@@ -146,3 +147,57 @@ def test_superseded_requirement_accepts_valid_same_kind_successor() -> None:
     index = ArtifactIndex.from_artifacts([old, successor])
 
     assert find_invalid_supersession_successors([old], index) == []
+
+
+def test_decision_supersession_requires_existing_decision_predecessor() -> None:
+    decision = Artifact(
+        kind="DEC",
+        data={"id": "DEC-002", "supersedes": ["DEC-404"]},
+        source="decisions/DEC-002.yaml",
+    )
+    index = ArtifactIndex.from_artifacts([decision])
+
+    findings = find_nonreciprocal_decision_supersessions([decision], index)
+
+    assert len(findings) == 1
+    assert findings[0].code == "INV-007"
+    assert findings[0].message == (
+        "decision DEC-002 supersedes missing decision DEC-404 (decisions/DEC-002.yaml)"
+    )
+
+
+def test_decision_supersession_requires_reciprocal_predecessor_state() -> None:
+    old = Artifact(
+        kind="DEC",
+        data={"id": "DEC-001", "status": "APPROVED", "superseded_by": None},
+        source="decisions/DEC-001.yaml",
+    )
+    new = Artifact(
+        kind="DEC",
+        data={"id": "DEC-002", "supersedes": ["DEC-001"]},
+        source="decisions/DEC-002.yaml",
+    )
+    index = ArtifactIndex.from_artifacts([old, new])
+
+    findings = find_nonreciprocal_decision_supersessions([new], index)
+
+    assert len(findings) == 1
+    assert findings[0].message == (
+        "decision DEC-002 supersedes DEC-001, but reciprocal supersession is not recorded"
+    )
+
+
+def test_decision_supersession_accepts_reciprocal_link() -> None:
+    old = Artifact(
+        kind="DEC",
+        data={"id": "DEC-001", "status": "SUPERSEDED", "superseded_by": "DEC-002"},
+        source="decisions/DEC-001.yaml",
+    )
+    new = Artifact(
+        kind="DEC",
+        data={"id": "DEC-002", "supersedes": ["DEC-001"]},
+        source="decisions/DEC-002.yaml",
+    )
+    index = ArtifactIndex.from_artifacts([old, new])
+
+    assert find_nonreciprocal_decision_supersessions([new], index) == []
