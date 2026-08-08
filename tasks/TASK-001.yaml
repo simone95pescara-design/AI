@@ -6,9 +6,7 @@ scope: "Cold-start reconstruction and repository bootstrap behavior only."
 baseline: "Governance V1.0 / DEC-001"
 authority: A2
 owner: null
-dependencies:
-  - REQ-001
-  - REQ-002
+dependencies: []
 blockers: []
 acceptance_criteria:
   - "Cold-start agent reconstructs baseline, requirements, decisions, state, and next action."
