@@ -12,25 +12,35 @@ from jsonschema import Draft202012Validator
 REPO = Path(__file__).resolve().parents[1]
 REQUIRED = [
     REPO / "AGENTS.md",
+    REPO / "BOOTSTRAP.md",
     REPO / "governance" / "SPECIFICATION.md",
     REPO / "governance" / "authority.md",
     REPO / "governance" / "knowledge-policy.md",
     REPO / "governance" / "response-protocol.md",
     REPO / "governance" / "invariants.md",
+    REPO / "governance" / "transition-model.md",
 ]
 SCHEMAS = {
     "DEC": REPO / "schemas" / "decision.schema.json",
     "REQ": REPO / "schemas" / "requirement.schema.json",
     "RISK": REPO / "schemas" / "risk.schema.json",
     "STATE": REPO / "schemas" / "state.schema.json",
+    "VER": REPO / "schemas" / "verification.schema.json",
+    "QUEUE": REPO / "schemas" / "queue.schema.json",
+    "DIA": REPO / "schemas" / "diagnostic.schema.json",
+    "TASK": REPO / "schemas" / "task.schema.json",
 }
 ARTIFACT_ROOTS = {
     "DEC": REPO / "decisions",
     "REQ": REPO / "requirements",
     "RISK": REPO / "risks",
     "STATE": REPO / "state",
+    "VER": REPO / "verification",
+    "QUEUE": REPO / "queue",
+    "DIA": REPO / "diagnostics",
+    "TASK": REPO / "tasks",
 }
-ID_PATTERN = re.compile(r"\b(?:DEC|REQ|RISK)-\d{3,}\b")
+ID_PATTERN = re.compile(r"\b(?:DEC|REQ|RISK|VER|QUEUE|DIA|TASK)-\d{3,}\b")
 SUPPORTED_SUFFIXES = {".yaml", ".yml", ".json"}
 
 
@@ -166,10 +176,34 @@ def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> lis
                 elif successor == item_id or successor not in indexed or indexed[successor][0] != "REQ":
                     fail("INV-003", f"superseded requirement {item_id} points to invalid successor {successor!r} ({rel})", errors)
 
+        if kind == "VER":
+            if status == "PASSED" and not (isinstance(data.get("evidence"), list) and data.get("evidence")):
+                fail("INV-011", f"verification {item_id} is PASSED without evidence ({rel})", errors)
+
+        if kind == "TASK":
+            if status == "DONE" and data.get("verification_status") == "FAILED":
+                fail("INV-004", f"task {item_id} is DONE with FAILED verification ({rel})", errors)
+            if status == "DOING" and not nonempty(data.get("owner")):
+                fail("INV-012", f"task {item_id} is DOING without explicit owner ({rel})", errors)
+
+        if kind == "QUEUE" and status == "PROMOTED":
+            target = data.get("promoted_to")
+            if not nonempty(target) or target not in indexed or indexed[target][0] != "TASK":
+                fail("INV-013", f"queue item {item_id} is PROMOTED without valid TASK target ({rel})", errors)
+
+        if kind == "DIA":
+            root_status = data.get("root_cause_status")
+            root_cause = data.get("root_cause")
+            if root_status == "CONFIRMED" and not nonempty(root_cause):
+                fail("INV-014", f"diagnostic {item_id} confirms root cause without root_cause text ({rel})", errors)
+            if root_status != "CONFIRMED" and status == "ROOT_CAUSE_CONFIRMED":
+                fail("INV-014", f"diagnostic {item_id} status/root_cause_status conflict ({rel})", errors)
+
         if kind == "STATE":
-            for task in data.get("tasks", []) or []:
-                if task.get("status") == "DONE" and task.get("verification_status") == "FAILED":
-                    fail("INV-004", f"task {task.get('id', '<unknown>')} is DONE with FAILED verification ({rel})", errors)
+            for key, expected_kind in (("active_tasks", "TASK"), ("queued_work", "QUEUE"), ("open_diagnostics", "DIA")):
+                for ref in data.get(key, []) or []:
+                    if ref not in indexed or indexed[ref][0] != expected_kind:
+                        fail("INV-015", f"state projection {key} references missing {expected_kind} {ref} ({rel})", errors)
 
         for ref in extract_references(data):
             if ref.startswith("REQ-") and ref not in requirement_ids:
@@ -223,6 +257,11 @@ def main() -> int:
     print("- INV-006 persistent IDs are unique")
     print("- INV-007 decision supersession is reciprocal")
     print("- INV-008 no obvious secrets detected")
+    print("- INV-011 PASSED verification has evidence")
+    print("- INV-012 DOING tasks have owners")
+    print("- INV-013 PROMOTED queue items target valid tasks")
+    print("- INV-014 diagnostic root-cause state is coherent")
+    print("- INV-015 state projection references resolve")
     return 0
 
 
