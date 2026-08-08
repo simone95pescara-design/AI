@@ -1,0 +1,24 @@
+id: REQ-002
+status: APPROVED
+title: "Self-bootstrapping repository"
+source: "Explicit user confirmation on 2026-08-08."
+requirement: "Once an AI agent is given the repository location and instructed to bootstrap the project, the repository must contain sufficient instructions for the agent to determine what to read, establish the current baseline and state, identify applicable governance, and begin work without manual transfer of prior conversation context."
+rationale: "Changing AI conversations or agents must not require the user to reproduce project context or governance manually."
+constraints:
+  - "The external bootstrap prompt should remain short and stable."
+  - "Prior conversation history must not be required."
+  - "The bootstrap sequence must be defined inside the repository."
+acceptance_criteria:
+  - "A new agent can start from repository URL plus a short bootstrap instruction."
+  - "The agent reads AGENTS.md and follows BOOTSTRAP.md."
+  - "The agent identifies the current baseline from state/current.yaml."
+  - "The agent identifies active approved requirements and decisions."
+  - "The agent identifies applicable governance before significant action."
+  - "No manual transfer of previous chat context is required."
+verification_method: "Open a fresh AI conversation, provide only the repository URL and the standard bootstrap instruction, and verify the resulting bootstrap assessment against these acceptance criteria."
+dependencies:
+  - "REQ-001"
+  - "DEC-001"
+related_decisions:
+  - "DEC-001"
+superseded_by: ""
