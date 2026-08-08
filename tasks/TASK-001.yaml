@@ -1,0 +1,26 @@
+id: TASK-001
+status: DONE
+title: "Verify cold-start and self-bootstrap"
+objective: "Verify REQ-001 and REQ-002 using a fresh AI conversation with repository-only context."
+scope: "Cold-start reconstruction and repository bootstrap behavior only."
+baseline: "Governance V1.0 / DEC-001"
+authority: A2
+owner: null
+dependencies:
+  - REQ-001
+  - REQ-002
+blockers: []
+acceptance_criteria:
+  - "Cold-start agent reconstructs baseline, requirements, decisions, state, and next action."
+  - "Bootstrap works from repository URL plus short instruction without prior chat context."
+verification_status: PASSED
+verification_refs:
+  - VER-001
+queue_source: null
+related_requirements:
+  - REQ-001
+  - REQ-002
+related_decisions:
+  - DEC-001
+next_action: null
+cancellation_reason: null
