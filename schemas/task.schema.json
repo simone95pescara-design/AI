@@ -20,7 +20,8 @@
     "queue_source": {"type": ["string", "null"], "pattern": "^QUEUE-[0-9]{3,}$"},
     "related_requirements": {"type": "array", "items": {"type": "string", "pattern": "^REQ-[0-9]{3,}$"}},
     "related_decisions": {"type": "array", "items": {"type": "string", "pattern": "^DEC-[0-9]{3,}$"}},
-    "next_action": {"type": ["string", "null"]}
+    "next_action": {"type": ["string", "null"]},
+    "cancellation_reason": {"type": ["string", "null"]}
   },
   "additionalProperties": false
 }
