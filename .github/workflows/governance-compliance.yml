@@ -21,7 +21,7 @@ jobs:
       - name: Install project and test dependencies
         run: python -m pip install ".[test]"
       - name: Run validator
-        run: python compliance/validate.py
+        run: ai-governance-compliance
       - name: Run tests
         run: python -m pytest tests/unit tests/governance tests/characterization tests/architecture tests/integration
       - name: Verify promoted baseline integrity
