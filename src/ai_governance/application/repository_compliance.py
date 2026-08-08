@@ -16,11 +16,19 @@ from ai_governance.domain.findings import Finding
 
 
 @dataclass(frozen=True, slots=True)
+class SchemaContract:
+    """One loaded active schema and its repository source."""
+
+    data: dict[str, Any]
+    source: str
+
+
+@dataclass(frozen=True, slots=True)
 class RepositoryComplianceSnapshot:
     """Repository data prepared by infrastructure for compliance evaluation."""
 
     artifacts: tuple[Artifact, ...]
-    schemas: Mapping[str, dict[str, Any]]
+    schemas: Mapping[str, SchemaContract]
     preflight_findings: tuple[Finding, ...] = ()
     security_findings: tuple[Finding, ...] = ()
 
@@ -33,20 +41,26 @@ def evaluate_repository_compliance(
     findings = list(snapshot.preflight_findings)
 
     valid_schemas: dict[str, dict[str, Any]] = {}
-    for kind, schema in snapshot.schemas.items():
-        issues = validate_schema_definition(schema)
+    for kind, contract in snapshot.schemas.items():
+        issues = validate_schema_definition(contract.data)
         if issues:
             for issue in issues:
+                message = (
+                    f"schema lacks object/required contract: {contract.source}"
+                    if issue == "schema lacks object/required contract"
+                    else f"invalid schema {contract.source}: {issue}"
+                )
                 findings.append(
                     Finding(
                         code="CHECK-002",
-                        message=issue,
+                        message=message,
+                        source=contract.source,
                         rule="schema-definition",
                         context={"artifact_kind": kind},
                     )
                 )
         else:
-            valid_schemas[kind] = schema
+            valid_schemas[kind] = contract.data
 
     if valid_schemas:
         validators = build_validators(valid_schemas)
