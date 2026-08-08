@@ -12,3 +12,5 @@ resume_when:
   - "Diagnostic findings are recorded."
   - "Material root causes are identified or explicitly marked UNKNOWN."
   - "Required corrective actions are completed or placed under controlled tracking."
+promoted_to: null
+superseded_by: null
