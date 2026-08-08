@@ -1,0 +1,40 @@
+id: DEC-003
+status: PROPOSED
+title: "Activate Operational Metamodel V1"
+date: "2026-08-08"
+problem: "Verification, deferred work, diagnostics, task lifecycle, and state projection semantics are currently incomplete or non-authoritative. Existing VER-* and QUEUE-* instances predate formal TR-MODEL-EXTEND activation, task ownership is unresolved, and state/current.yaml mixes owned facts with projection data."
+context: "DEC-002 made Transition Model V1 normative and requires new artifact types to complete TR-MODEL-EXTEND before authoritative use. TASK-003 remains active until these model gaps are aligned."
+alternatives:
+  - "Continue using the current mixed state representation and treat VER/QUEUE as informal artifacts."
+  - "Activate verification, queue, diagnostic, and task artifact types together with explicit ownership and make state/current.yaml a derived project-state projection."
+  - "Use GitHub Issues/Projects as the sole authoritative task and queue system and remove repository-native task/queue artifacts."
+decision: "PROPOSED: activate Operational Metamodel V1 with repository-native VER, QUEUE, DIA, and TASK artifacts, while defining state/current.yaml as a non-owning projection of current project state."
+rationale: "A single explicit owner per persistent fact reduces state drift and permits deterministic validation, cold-start reconstruction, transition enforcement, and later semi-autonomous execution. Repository-native artifacts preserve portability across AI tools and conversations while GitHub remains the transport/version-control layer."
+consequences:
+  - "verification/ becomes authoritative for formal verification and validation results."
+  - "queue/ becomes authoritative for deliberately deferred work that is not yet an executable task."
+  - "diagnostics/ becomes authoritative for observations, hypotheses, root-cause status, corrective/preventive actions, and closure."
+  - "tasks/ becomes authoritative for task lifecycle, ownership, dependencies, readiness, verification links, and completion."
+  - "state/current.yaml becomes a projection/summary and must not override facts owned by DEC, REQ, VER, QUEUE, DIA, or TASK artifacts."
+  - "Existing VER-001 and QUEUE-001 require migration into the activated schemas before they become authoritative."
+  - "TASK entries embedded in state/current.yaml must be migrated to TASK artifacts; the state task list becomes a projection or is removed."
+  - "GitHub Issues may later be integrated as a synchronized interface, but are not selected as the source of truth by this proposal."
+affected_items:
+  - "governance/operational-metamodel.md"
+  - "governance/invariants.md"
+  - "schemas/"
+  - "templates/"
+  - "compliance/validate.py"
+  - "tests/governance/"
+  - "verification/"
+  - "queue/"
+  - "diagnostics/"
+  - "tasks/"
+  - "state/current.yaml"
+supersedes: []
+superseded_by: null
+evidence:
+  - "RC-00/RC-01 analysis and DEC-002 Transition Model V1."
+  - "Existing VER-001 and QUEUE-001 were created before formal artifact-type activation."
+  - "TASK lifecycle ownership is explicitly unresolved in Transition Model V1."
+  - "state/current.yaml currently contains task lifecycle data also needed by future execution logic."
