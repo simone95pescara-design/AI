@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Decision",
+  "type": "object",
+  "required": ["id","status","title","problem","decision","rationale"],
+  "properties": {
+    "id": {"type":"string","pattern":"^DEC-[0-9]{3,}$"},
+    "status": {"enum":["PROPOSED","APPROVED","REJECTED","SUPERSEDED","DEPRECATED"]},
+    "date": {"type":"string"},
+    "title": {"type":"string","minLength":1},
+    "problem": {"type":"string","minLength":1},
+    "context": {"type":"string"},
+    "alternatives": {"type":"array"},
+    "decision": {"type":"string","minLength":1},
+    "rationale": {"type":"string","minLength":1},
+    "consequences": {"type":"array"},
+    "affected_items": {"type":"array"},
+    "supersedes": {"type":"array"},
+    "evidence": {"type":"array"}
+  },
+  "additionalProperties": false
+}
