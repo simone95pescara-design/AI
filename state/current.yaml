@@ -1,38 +1,29 @@
 project: "AI Project Governance Framework"
-baseline: "Governance V1.0 + Transition Model V1 / DEC-001 + DEC-002"
+baseline: "Governance V1.0 + Transition Model V1 + Repository Engineering V1 + Product Metamodel V2 / DEC-001 + DEC-002 + DEC-004 + DEC-005"
 status: ACTIVE
 updated_at: "2026-08-08"
 completed:
-  - "Core governance files established."
-  - "Governance V1.0 explicitly approved and recorded as DEC-001."
-  - "Cold-start reconstructibility requirement REQ-001 verified as PASSED."
-  - "Self-bootstrapping requirement REQ-002 verified as PASSED."
-  - "Persistent verification record VER-001 created for REQ-001 and REQ-002."
-  - "Initial schemas, templates, compliance validator, governance tests, and GitHub Actions workflow established."
-  - "Pre-existing decision/requirement schema drift repaired through PR #2 with passing compliance."
-  - "Transition Model V1 approved as DEC-002 and promoted to main through PR #1 after passing compliance."
+  - "Governance V1.0 approved as DEC-001."
+  - "Transition Model V1 approved as DEC-002 and promoted to baseline."
+  - "Repository Engineering V1 approved as DEC-004."
+  - "Core Python governance/compliance logic migrated incrementally into src/ai_governance with domain/application/infrastructure/cli layers."
+  - "Product Metamodel V2 approved as DEC-005; SYS/BEH remain candidate contracts and are not active artifact types."
+  - "Historical Operational Metamodel V1 PR #4 closed without merge as superseded by DEC-005."
+  - "Repository Closure Audit merged through PR #27 with finite gap list RC-01..RC-18."
+  - "Wave A truth/promotion integrity realigned baseline-facing state and normative markers and introduced post-promotion verification."
 in_progress:
-  - "TASK-003: investigate and align current repository/process inconsistencies before extending autonomous-development capabilities."
-  - "Apply TR-MODEL-EXTEND to verification, queue, diagnostic, task ownership, and state projection semantics."
-blocked: []
+  - "Repository Engineering closure remediation remains active after Wave A."
+  - "Functional expansion is frozen until the Repository Engineering V1 exit gate passes."
+blocked:
+  - "Product Metamodel V2 implementation beyond candidate SYS/BEH schemas is blocked by Repository Engineering closure."
 open_issues:
-  - "governance/transition-model.md on main still labels itself APPROVED_CANDIDATE after promotion; this is a post-promotion projection defect and must not be interpreted as the normative state of DEC-002."
-  - "Existing VER-* and QUEUE-* instances predate formal metamodel activation and are non-authoritative until migrated or retired through TR-MODEL-EXTEND."
-  - "Task lifecycle ownership remains unresolved and task transitions are provisional."
-  - "Diagnostic lifecycle is normative at transition level but no diagnostic artifact type is yet MODEL_ACTIVE."
-  - "Autonomous-development readiness work remains deferred until diagnostic alignment is complete."
+  - "Wave B remains: canonical Python execution path and error-model alignment (RC-04, RC-05, RC-06, RC-08)."
+  - "Wave C remains: repository architecture enforcement and required-path alignment (RC-07, RC-12, RC-15, RC-16)."
+  - "Wave D remains: documentation, language, naming and candidate-contract normalization (RC-09, RC-10, RC-11, RC-14)."
+  - "Wave E remains: current-baseline cold-start evidence and independent final closure audit (RC-17)."
+  - "Branch cleanup RC-18 remains final cleanup and is not part of functional remediation waves."
 next_actions:
-  - "Promote this state-alignment repair through PR and compliance."
-  - "Prepare a governed metamodel-extension candidate for verification, queue, diagnostic, task, and state projection ownership."
-  - "Do not treat new artifact types as authoritative before explicit A3 approval and baseline promotion."
+  - "Complete Wave B without starting SYS/BEH domain implementation or trading work."
+  - "After each remediation wave, require CI/test evidence before proceeding to the next wave."
+  - "Declare Repository Engineering V1 CLOSED/STABLE only after the exit gate in docs/repository-closure-audit.md passes."
 verification_status: PARTIAL
-tasks:
-  - id: "TASK-001"
-    status: DONE
-    verification_status: PASSED
-  - id: "TASK-002"
-    status: TODO
-    verification_status: UNKNOWN
-  - id: "TASK-003"
-    status: DOING
-    verification_status: PARTIAL
