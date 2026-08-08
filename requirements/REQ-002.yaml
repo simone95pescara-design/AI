@@ -21,4 +21,4 @@ dependencies:
   - "DEC-001"
 related_decisions:
   - "DEC-001"
-superseded_by: ""
+superseded_by: null
