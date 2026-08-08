@@ -108,6 +108,39 @@ def test_legacy_requirement_approval_contract():
     ]
 
 
+def test_legacy_superseded_decision_requires_successor_contract():
+    errors = validator.validate_semantics([
+        artifact(
+            "DEC",
+            "decisions/DEC-001.yaml",
+            {"id": "DEC-001", "status": "SUPERSEDED", "superseded_by": None},
+        )
+    ])
+
+    assert errors == [
+        "INV-003: superseded decision DEC-001 must declare superseded_by (decisions/DEC-001.yaml)"
+    ]
+
+
+def test_legacy_superseded_requirement_rejects_wrong_kind_successor_contract():
+    errors = validator.validate_semantics([
+        artifact(
+            "REQ",
+            "requirements/REQ-001.yaml",
+            {"id": "REQ-001", "status": "SUPERSEDED", "superseded_by": "DEC-002"},
+        ),
+        artifact(
+            "DEC",
+            "decisions/DEC-002.yaml",
+            {"id": "DEC-002", "status": "APPROVED", "rationale": "reason"},
+        ),
+    ])
+
+    assert errors == [
+        "INV-003: superseded requirement REQ-001 points to invalid successor 'DEC-002' (requirements/REQ-001.yaml)"
+    ]
+
+
 def test_legacy_state_done_failed_contract():
     errors = validator.validate_semantics([
         artifact(

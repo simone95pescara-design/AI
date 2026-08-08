@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+from ai_governance.domain.artifact_index import ArtifactIndex
 from ai_governance.domain.artifacts import Artifact
 from ai_governance.domain.findings import Finding
 
@@ -61,6 +62,52 @@ def find_approved_requirements_without_verification_method(
                 location="verification_method",
             )
         )
+    return findings
+
+
+def find_invalid_supersession_successors(
+    artifacts: Iterable[Artifact],
+    index: ArtifactIndex,
+) -> list[Finding]:
+    """Return INV-003 findings for invalid DEC/REQ supersession successors."""
+
+    findings: list[Finding] = []
+    for artifact in artifacts:
+        if artifact.kind not in {"DEC", "REQ"}:
+            continue
+        if artifact.data.get("status") != "SUPERSEDED":
+            continue
+
+        source = artifact.source or "<unknown>"
+        item_id = artifact.artifact_id or source
+        noun = "decision" if artifact.kind == "DEC" else "requirement"
+        successor = artifact.data.get("superseded_by")
+
+        if not _nonempty_text(successor):
+            findings.append(
+                Finding(
+                    code="INV-003",
+                    message=f"superseded {noun} {item_id} must declare superseded_by ({source})",
+                    source=source,
+                    location="superseded_by",
+                )
+            )
+            continue
+
+        target = index.get(successor)
+        if successor == item_id or target is None or target.kind != artifact.kind:
+            findings.append(
+                Finding(
+                    code="INV-003",
+                    message=(
+                        f"superseded {noun} {item_id} points to invalid successor "
+                        f"{successor!r} ({source})"
+                    ),
+                    source=source,
+                    location="superseded_by",
+                )
+            )
+
     return findings
 
 

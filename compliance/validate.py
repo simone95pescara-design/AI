@@ -10,11 +10,13 @@ from ai_governance.application.schema_validation import (
     validate_artifacts,
     validate_schema_definition,
 )
+from ai_governance.domain.artifact_index import ArtifactIndex
 from ai_governance.domain.artifacts import Artifact
 from ai_governance.domain.invariants import (
     find_approved_decisions_without_rationale,
     find_approved_requirements_without_verification_method,
     find_duplicate_ids,
+    find_invalid_supersession_successors,
 )
 from ai_governance.infrastructure.artifact_mapping import domain_artifact
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
@@ -137,29 +139,28 @@ def extract_references(value: Any) -> set[str]:
 def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> list[str]:
     errors: list[str] = []
     indexed: dict[str, tuple[str, Path, dict[str, Any]]] = {}
+    domain_artifacts: list[Artifact] = []
     for kind, path, data in artifacts:
         item_id = data.get("id")
         if kind != "STATE" and isinstance(item_id, str):
             indexed[item_id] = (kind, path, data)
+        rel = path.relative_to(REPO) if path.is_absolute() else path
+        domain_artifacts.append(Artifact(kind=kind, data=data, source=str(rel)))
 
+    artifact_index = ArtifactIndex.from_artifacts(domain_artifacts)
     requirement_ids = {item_id for item_id, (kind, _, _) in indexed.items() if kind == "REQ"}
 
     for kind, path, data in artifacts:
         rel = path.relative_to(REPO) if path.is_absolute() else path
         item_id = data.get("id", str(rel))
-        status = data.get("status")
+        current_artifact = Artifact(kind=kind, data=data, source=str(rel))
 
         if kind == "DEC":
-            decision_artifact = Artifact(kind=kind, data=data, source=str(rel))
-            for finding in find_approved_decisions_without_rationale([decision_artifact]):
+            for finding in find_approved_decisions_without_rationale([current_artifact]):
+                fail(finding.code, finding.message, errors)
+            for finding in find_invalid_supersession_successors([current_artifact], artifact_index):
                 fail(finding.code, finding.message, errors)
 
-            if status == "SUPERSEDED":
-                successor = data.get("superseded_by")
-                if not nonempty(successor):
-                    fail("INV-003", f"superseded decision {item_id} must declare superseded_by ({rel})", errors)
-                elif successor == item_id or successor not in indexed or indexed[successor][0] != "DEC":
-                    fail("INV-003", f"superseded decision {item_id} points to invalid successor {successor!r} ({rel})", errors)
             for predecessor in data.get("supersedes", []) or []:
                 if predecessor not in indexed or indexed[predecessor][0] != "DEC":
                     fail("INV-007", f"decision {item_id} supersedes missing decision {predecessor} ({rel})", errors)
@@ -169,16 +170,10 @@ def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> lis
                         fail("INV-007", f"decision {item_id} supersedes {predecessor}, but reciprocal supersession is not recorded", errors)
 
         if kind == "REQ":
-            requirement_artifact = Artifact(kind=kind, data=data, source=str(rel))
-            for finding in find_approved_requirements_without_verification_method([requirement_artifact]):
+            for finding in find_approved_requirements_without_verification_method([current_artifact]):
                 fail(finding.code, finding.message, errors)
-
-            if status == "SUPERSEDED":
-                successor = data.get("superseded_by")
-                if not nonempty(successor):
-                    fail("INV-003", f"superseded requirement {item_id} must declare superseded_by ({rel})", errors)
-                elif successor == item_id or successor not in indexed or indexed[successor][0] != "REQ":
-                    fail("INV-003", f"superseded requirement {item_id} points to invalid successor {successor!r} ({rel})", errors)
+            for finding in find_invalid_supersession_successors([current_artifact], artifact_index):
+                fail(finding.code, finding.message, errors)
 
         if kind == "STATE":
             for task in data.get("tasks", []) or []:
