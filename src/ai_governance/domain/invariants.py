@@ -8,6 +8,35 @@ from ai_governance.domain.artifacts import Artifact
 from ai_governance.domain.findings import Finding
 
 
+def _nonempty_text(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def find_approved_decisions_without_rationale(
+    artifacts: Iterable[Artifact],
+) -> list[Finding]:
+    """Return INV-002 findings for approved decisions without rationale."""
+
+    findings: list[Finding] = []
+    for artifact in artifacts:
+        if artifact.kind != "DEC" or artifact.data.get("status") != "APPROVED":
+            continue
+        if _nonempty_text(artifact.data.get("rationale")):
+            continue
+
+        source = artifact.source or "<unknown>"
+        item_id = artifact.artifact_id or source
+        findings.append(
+            Finding(
+                code="INV-002",
+                message=f"approved decision {item_id} has no rationale ({source})",
+                source=source,
+                location="rationale",
+            )
+        )
+    return findings
+
+
 def find_duplicate_ids(artifacts: Iterable[Artifact]) -> list[Finding]:
     """Return INV-006 findings for duplicate persistent IDs.
 
