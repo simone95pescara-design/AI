@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QueueItem",
+  "type": "object",
+  "required": ["id", "status", "title", "reason", "objective"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^QUEUE-[0-9]{3,}$"},
+    "status": {"enum": ["QUEUED", "READY_FOR_TRIAGE", "PROMOTED", "CANCELLED", "SUPERSEDED"]},
+    "title": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string"},
+    "reason": {"type": "string", "minLength": 1},
+    "objective": {"type": "string", "minLength": 1},
+    "prerequisites": {"type": "array", "items": {"type": "string"}},
+    "resume_when": {"type": "array", "items": {"type": "string"}},
+    "promoted_to": {"type": ["string", "null"], "pattern": "^TASK-[0-9]{3,}$"},
+    "superseded_by": {"type": ["string", "null"], "pattern": "^QUEUE-[0-9]{3,}$"}
+  },
+  "additionalProperties": false
+}
