@@ -141,6 +141,39 @@ def test_legacy_superseded_requirement_rejects_wrong_kind_successor_contract():
     ]
 
 
+def test_legacy_decision_supersedes_missing_predecessor_contract():
+    errors = validator.validate_semantics([
+        artifact(
+            "DEC",
+            "decisions/DEC-002.yaml",
+            {"id": "DEC-002", "status": "APPROVED", "rationale": "reason", "supersedes": ["DEC-404"]},
+        )
+    ])
+
+    assert errors == [
+        "INV-007: decision DEC-002 supersedes missing decision DEC-404 (decisions/DEC-002.yaml)"
+    ]
+
+
+def test_legacy_decision_supersession_reciprocity_contract():
+    errors = validator.validate_semantics([
+        artifact(
+            "DEC",
+            "decisions/DEC-001.yaml",
+            {"id": "DEC-001", "status": "APPROVED", "rationale": "reason"},
+        ),
+        artifact(
+            "DEC",
+            "decisions/DEC-002.yaml",
+            {"id": "DEC-002", "status": "APPROVED", "rationale": "reason", "supersedes": ["DEC-001"]},
+        ),
+    ])
+
+    assert errors == [
+        "INV-007: decision DEC-002 supersedes DEC-001, but reciprocal supersession is not recorded"
+    ]
+
+
 def test_legacy_state_done_failed_contract():
     errors = validator.validate_semantics([
         artifact(
