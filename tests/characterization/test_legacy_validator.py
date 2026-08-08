@@ -11,7 +11,10 @@ SPEC.loader.exec_module(validator)
 
 
 def artifact(kind, path, data):
-    return (kind, Path(path), data)
+    artifact_path = Path(path)
+    if not artifact_path.is_absolute():
+        artifact_path = REPO / artifact_path
+    return (kind, artifact_path, data)
 
 
 def test_legacy_cli_pass_contract_on_current_repository():
