@@ -1,0 +1,33 @@
+id: DEC-002
+status: PROPOSED
+title: "Adopt Transition Model V1 for governed state changes"
+date: "2026-08-08"
+problem: "Governance V1.0 defines many artifact states and behavioral constraints, but does not define a complete normative model for significant state transitions, promotion gates, metamodel evolution, diagnostic closure, and atomic side effects. This allows model drift, baseline contamination risk, ambiguous ownership, and repeated diagnosis gaps."
+context: "Repository audit identified RC-00: the framework governs states more completely than transitions. RC-01 (non-atomic metamodel evolution) and RC-02 (working state not technically separated from approved baseline) are confirmed downstream causes. H-03 (knowledge ownership ambiguity) remains a hypothesis to be resolved by the transition model."
+alternatives:
+  - "Keep Governance V1.0 state-centric and address each failure mode with local rules."
+  - "Introduce a normative Transition Model V1 with explicit triggers, preconditions, authority, evidence, atomic effects, postconditions, failure behavior, rollback, persistence, and audit."
+  - "Replace the current governance framework entirely with an external workflow engine."
+decision: "PROPOSED: introduce Transition Model V1 as the normative mechanism for significant state changes."
+rationale: "A generic transition contract addresses the common architectural gap instead of correcting individual symptoms repeatedly. It also provides a foundation for later automation and semi-autonomous software delivery."
+consequences:
+  - "Significant state changes will require explicit transition definitions."
+  - "New artifact types cannot become ACTIVE before metamodel activation criteria are satisfied."
+  - "Working changes and approved baseline promotion will be separated conceptually and later technically."
+  - "Diagnostic findings will require an explicit lifecycle before closure."
+  - "Existing VER, QUEUE, state, and workflow artifacts will require alignment only after this proposal is approved."
+affected_items:
+  - "governance/SPECIFICATION.md"
+  - "governance/transition-model.md"
+  - "state/current.yaml"
+  - "compliance/validate.py"
+  - "schemas/"
+  - "templates/"
+  - "verification/"
+  - "queue/"
+supersedes: []
+superseded_by: ""
+evidence:
+  - "Repository audit and transition coverage analysis performed on 2026-08-08."
+  - "Observed introduction of VER-* and QUEUE-* before full metamodel integration."
+  - "Observed direct writes to main without a mandatory candidate-to-baseline promotion gate."
