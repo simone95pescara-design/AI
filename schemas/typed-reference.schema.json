@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "typed-reference.schema.json",
+  "title": "TypedReference",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["kind", "target"],
+      "properties": {
+        "kind": {"const": "artifact"},
+        "target": {"type": "string", "pattern": "^(?:DEC|REQ|RISK|SYS|BEH)-[0-9]{3,}$"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["kind", "target", "element"],
+      "properties": {
+        "kind": {"const": "element"},
+        "target": {"type": "string", "pattern": "^(?:SYS|BEH)-[0-9]{3,}$"},
+        "element": {"type": "string", "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["kind", "target_type", "target"],
+      "properties": {
+        "kind": {"const": "implementation"},
+        "target_type": {"enum": ["file", "package", "module", "test", "config", "schema", "migration", "deployment", "entry_point", "adapter"]},
+        "target": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    }
+  ]
+}
