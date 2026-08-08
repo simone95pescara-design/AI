@@ -1,7 +1,7 @@
-# Transition Model V1 — APPROVED CANDIDATE
+# Transition Model V1 — APPROVED
 
-Status: APPROVED_CANDIDATE
-Authority: this document becomes normative only after `DEC-002` is explicitly approved, all mandatory candidate checks pass, and the approved candidate is promoted to the designated baseline branch.
+Status: APPROVED
+Authority: normative under `DEC-002` and baseline promotion on `main`.
 
 ## Purpose
 
@@ -397,7 +397,6 @@ Persistence:
 
 Audit:
 - source candidate, prior baseline, resulting baseline, approvals, CI/check results.
-
 Rollback: explicit revert/rollback transition; history remains reconstructible.
 Migration: NOT_APPLICABLE unless contained transitions require migration.
 External effects: baseline branch/ref mutation; downstream automation may be triggered and must be considered in impact analysis.

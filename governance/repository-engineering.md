@@ -1,7 +1,7 @@
-# Repository Engineering V1 — PROPOSTA
+# Repository Engineering V1 — APPROVATO
 
-Stato: PROPOSTO
-Autorità: diventa normativo solo dopo approvazione esplicita di `DEC-004`, verifica del candidate e promozione in baseline.
+Stato: APPROVATO
+Autorità: normativa ai sensi di `DEC-004` e della promozione in baseline su `main`.
 
 ## 1. Scopo
 

@@ -24,3 +24,6 @@ jobs:
         run: python compliance/validate.py
       - name: Run tests
         run: python -m pytest tests/unit tests/governance tests/characterization tests/architecture tests/integration
+      - name: Verify promoted baseline integrity
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: python -m ai_governance.cli.post_promotion
