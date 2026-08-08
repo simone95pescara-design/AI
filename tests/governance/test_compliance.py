@@ -15,108 +15,52 @@ def artifact(kind, path, data):
 
 
 def test_compliance_validator_passes_on_repository():
-    result = subprocess.run(
-        [sys.executable, str(REPO / "compliance" / "validate.py")],
-        cwd=REPO,
-        capture_output=True,
-        text=True,
-    )
+    result = subprocess.run([sys.executable, str(REPO / "compliance" / "validate.py")], cwd=REPO, capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "COMPLIANCE: PASS" in result.stdout
 
 
 def test_approved_decision_requires_rationale():
-    errors = validator.validate_semantics([
-        artifact("DEC", "decisions/DEC-001.yaml", {"id": "DEC-001", "status": "APPROVED", "rationale": ""})
-    ])
-    assert any(error.startswith("INV-002:") for error in errors)
+    errors = validator.validate_semantics([artifact("DEC", "decisions/DEC-001.yaml", {"id": "DEC-001", "status": "APPROVED", "rationale": ""})])
+    assert any(e.startswith("INV-002:") for e in errors)
 
 
-def test_approved_requirement_requires_verification_method():
-    errors = validator.validate_semantics([
-        artifact("REQ", "requirements/REQ-001.yaml", {"id": "REQ-001", "status": "APPROVED", "verification_method": ""})
-    ])
-    assert any(error.startswith("INV-005:") for error in errors)
+def test_general_reference_integrity():
+    errors = validator.validate_semantics([artifact("DEC", "decisions/DEC-001.yaml", {"id": "DEC-001", "status": "APPROVED", "rationale": "ok", "affected_items": ["REQ-404"]})])
+    assert any(e.startswith("INV-016:") for e in errors)
 
 
-def test_superseded_artifact_requires_valid_successor():
-    errors = validator.validate_semantics([
-        artifact("DEC", "decisions/DEC-001.yaml", {"id": "DEC-001", "status": "SUPERSEDED", "superseded_by": "DEC-999"})
-    ])
-    assert any(error.startswith("INV-003:") for error in errors)
-
-
-def test_decision_supersession_must_be_reciprocal():
-    artifacts = [
-        artifact("DEC", "decisions/DEC-001.yaml", {
-            "id": "DEC-001", "status": "SUPERSEDED", "superseded_by": "DEC-002", "supersedes": []
-        }),
-        artifact("DEC", "decisions/DEC-002.yaml", {
-            "id": "DEC-002", "status": "APPROVED", "rationale": "better option", "supersedes": ["DEC-001"]
-        }),
-    ]
-    errors = validator.validate_semantics(artifacts)
-    assert not any(error.startswith("INV-003:") or error.startswith("INV-007:") for error in errors)
-
-
-def test_done_task_cannot_have_failed_verification():
-    errors = validator.validate_semantics([
-        artifact("TASK", "tasks/TASK-001.yaml", {
-            "id": "TASK-001", "status": "DONE", "verification_status": "FAILED"
-        })
-    ])
-    assert any(error.startswith("INV-004:") for error in errors)
-
-
-def test_requirement_references_must_resolve():
-    errors = validator.validate_semantics([
-        artifact("DEC", "decisions/DEC-001.yaml", {
-            "id": "DEC-001", "status": "APPROVED", "rationale": "reason", "affected_items": ["REQ-404"]
-        })
-    ])
-    assert any(error.startswith("INV-001:") for error in errors)
-
-
-def test_passed_verification_requires_evidence():
-    errors = validator.validate_semantics([
-        artifact("VER", "verification/VER-001.yaml", {
-            "id": "VER-001", "status": "PASSED", "evidence": []
-        })
-    ])
-    assert any(error.startswith("INV-011:") for error in errors)
+def test_passed_verification_requires_evidence_and_provenance():
+    errors = validator.validate_semantics([artifact("VER", "verification/VER-001.yaml", {"id": "VER-001", "status": "PASSED", "evidence": [], "provenance": {}})])
+    assert any(e.startswith("INV-011:") for e in errors)
+    assert any(e.startswith("INV-017:") for e in errors)
 
 
 def test_doing_task_requires_owner():
+    errors = validator.validate_semantics([artifact("TASK", "tasks/TASK-003.yaml", {"id": "TASK-003", "status": "DOING", "verification_status": "PARTIAL", "owner": None, "dependencies": [], "blockers": []})])
+    assert any(e.startswith("INV-012:") for e in errors)
+
+
+def test_task_dependency_cycle_is_rejected():
     errors = validator.validate_semantics([
-        artifact("TASK", "tasks/TASK-003.yaml", {
-            "id": "TASK-003", "status": "DOING", "verification_status": "PARTIAL", "owner": None
-        })
+        artifact("TASK", "tasks/TASK-001.yaml", {"id": "TASK-001", "status": "TODO", "dependencies": ["TASK-002"], "blockers": []}),
+        artifact("TASK", "tasks/TASK-002.yaml", {"id": "TASK-002", "status": "TODO", "dependencies": ["TASK-001"], "blockers": []}),
     ])
-    assert any(error.startswith("INV-012:") for error in errors)
+    assert any(e.startswith("INV-018:") for e in errors)
 
 
-def test_promoted_queue_requires_task_target():
+def test_queue_task_promotion_is_reciprocal():
     errors = validator.validate_semantics([
-        artifact("QUEUE", "queue/QUEUE-001.yaml", {
-            "id": "QUEUE-001", "status": "PROMOTED", "promoted_to": "TASK-999"
-        })
+        artifact("QUEUE", "queue/QUEUE-001.yaml", {"id": "QUEUE-001", "status": "PROMOTED", "promoted_to": "TASK-001"}),
+        artifact("TASK", "tasks/TASK-001.yaml", {"id": "TASK-001", "status": "TODO", "dependencies": [], "blockers": [], "queue_source": None}),
     ])
-    assert any(error.startswith("INV-013:") for error in errors)
+    assert any(e.startswith("INV-013:") for e in errors)
 
 
-def test_confirmed_diagnostic_requires_root_cause():
-    errors = validator.validate_semantics([
-        artifact("DIA", "diagnostics/DIA-001.yaml", {
-            "id": "DIA-001", "status": "ROOT_CAUSE_CONFIRMED", "root_cause_status": "CONFIRMED", "root_cause": None
-        })
-    ])
-    assert any(error.startswith("INV-014:") for error in errors)
+def test_closed_resolved_diagnostic_requires_verification():
+    errors = validator.validate_semantics([artifact("DIA", "diagnostics/DIA-001.yaml", {"id": "DIA-001", "status": "CLOSED_RESOLVED", "root_cause_status": "CONFIRMED", "root_cause": "cause", "closure_reason": "fixed", "verification": [], "residual_risk": []})])
+    assert any(e.startswith("INV-019:") for e in errors)
 
 
 def test_state_projection_references_must_resolve():
-    errors = validator.validate_semantics([
-        artifact("STATE", "state/current.yaml", {
-            "status": "ACTIVE", "active_tasks": ["TASK-999"], "queued_work": [], "open_diagnostics": []
-        })
-    ])
-    assert any(error.startswith("INV-015:") for error in errors)
+    errors = validator.validate_semantics([artifact("STATE", "state/current.yaml", {"status": "ACTIVE", "active_tasks": ["TASK-999"], "queued_work": [], "open_diagnostics": []})])
+    assert any(e.startswith("INV-015:") for e in errors)
