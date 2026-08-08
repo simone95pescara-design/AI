@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from ai_governance.domain.artifact_index import ArtifactIndex
 from ai_governance.domain.artifacts import Artifact
 from ai_governance.domain.findings import Finding
+from ai_governance.domain.references import extract_persistent_reference_ids
 
 
 def _nonempty_text(value: object) -> bool:
@@ -156,6 +157,37 @@ def find_nonreciprocal_decision_supersessions(
                     )
                 )
 
+    return findings
+
+
+def find_missing_requirement_references(
+    artifacts: Iterable[Artifact],
+    index: ArtifactIndex,
+) -> list[Finding]:
+    """Return legacy INV-001 findings for unresolved REQ-* references only.
+
+    DEC-* and RISK-* references are deliberately ignored here to preserve the
+    current baseline behavior. Broadening referential integrity is a separate
+    governance change, not part of this refactoring.
+    """
+
+    findings: list[Finding] = []
+    for artifact in artifacts:
+        source = artifact.source or "<unknown>"
+        item_id = artifact.artifact_id or source
+        for ref in extract_persistent_reference_ids(artifact.data):
+            if not ref.startswith("REQ-"):
+                continue
+            target = index.get(ref)
+            if target is not None and target.kind == "REQ":
+                continue
+            findings.append(
+                Finding(
+                    code="INV-001",
+                    message=f"{item_id} references missing requirement {ref} ({source})",
+                    source=source,
+                )
+            )
     return findings
 
 

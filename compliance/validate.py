@@ -17,8 +17,10 @@ from ai_governance.domain.invariants import (
     find_approved_requirements_without_verification_method,
     find_duplicate_ids,
     find_invalid_supersession_successors,
+    find_missing_requirement_references,
     find_nonreciprocal_decision_supersessions,
 )
+from ai_governance.domain.references import extract_persistent_reference_ids
 from ai_governance.infrastructure.artifact_mapping import domain_artifact
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
 from ai_governance.infrastructure.document_io import (
@@ -36,7 +38,6 @@ REPO = Path(__file__).resolve().parents[1]
 REQUIRED = required_paths(REPO)
 SCHEMAS = schema_paths(REPO)
 ARTIFACT_ROOTS = artifact_roots(REPO)
-ID_PATTERN = re.compile(r"\b(?:DEC|REQ|RISK)-\d{3,}\b")
 SUPPORTED_SUFFIXES = SUPPORTED_DOCUMENT_SUFFIXES
 
 
@@ -125,35 +126,21 @@ def check_duplicate_ids(artifacts: list[tuple[str, Path, dict[str, Any]]], error
 
 
 def extract_references(value: Any) -> set[str]:
-    refs: set[str] = set()
-    if isinstance(value, str):
-        refs.update(ID_PATTERN.findall(value))
-    elif isinstance(value, list):
-        for item in value:
-            refs.update(extract_references(item))
-    elif isinstance(value, dict):
-        for item in value.values():
-            refs.update(extract_references(item))
-    return refs
+    """Compatibility wrapper around domain persistent-reference parsing."""
+    return extract_persistent_reference_ids(value)
 
 
 def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> list[str]:
     errors: list[str] = []
-    indexed: dict[str, tuple[str, Path, dict[str, Any]]] = {}
     domain_artifacts: list[Artifact] = []
     for kind, path, data in artifacts:
-        item_id = data.get("id")
-        if kind != "STATE" and isinstance(item_id, str):
-            indexed[item_id] = (kind, path, data)
         rel = path.relative_to(REPO) if path.is_absolute() else path
         domain_artifacts.append(Artifact(kind=kind, data=data, source=str(rel)))
 
     artifact_index = ArtifactIndex.from_artifacts(domain_artifacts)
-    requirement_ids = {item_id for item_id, (kind, _, _) in indexed.items() if kind == "REQ"}
 
     for kind, path, data in artifacts:
         rel = path.relative_to(REPO) if path.is_absolute() else path
-        item_id = data.get("id", str(rel))
         current_artifact = Artifact(kind=kind, data=data, source=str(rel))
 
         if kind == "DEC":
@@ -175,9 +162,8 @@ def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> lis
                 if task.get("status") == "DONE" and task.get("verification_status") == "FAILED":
                     fail("INV-004", f"task {task.get('id', '<unknown>')} is DONE with FAILED verification ({rel})", errors)
 
-        for ref in extract_references(data):
-            if ref.startswith("REQ-") and ref not in requirement_ids:
-                fail("INV-001", f"{item_id} references missing requirement {ref} ({rel})", errors)
+        for finding in find_missing_requirement_references([current_artifact], artifact_index):
+            fail(finding.code, finding.message, errors)
 
     return errors
 

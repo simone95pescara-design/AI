@@ -4,6 +4,7 @@ from ai_governance.domain.invariants import (
     find_approved_requirements_without_verification_method,
     find_duplicate_ids,
     find_invalid_supersession_successors,
+    find_missing_requirement_references,
     find_nonreciprocal_decision_supersessions,
 )
 
@@ -201,3 +202,47 @@ def test_decision_supersession_accepts_reciprocal_link() -> None:
     index = ArtifactIndex.from_artifacts([old, new])
 
     assert find_nonreciprocal_decision_supersessions([new], index) == []
+
+
+def test_missing_requirement_reference_is_reported() -> None:
+    decision = Artifact(
+        kind="DEC",
+        data={"id": "DEC-001", "affected_items": ["REQ-404"]},
+        source="decisions/DEC-001.yaml",
+    )
+    index = ArtifactIndex.from_artifacts([decision])
+
+    findings = find_missing_requirement_references([decision], index)
+
+    assert len(findings) == 1
+    assert findings[0].code == "INV-001"
+    assert findings[0].message == (
+        "DEC-001 references missing requirement REQ-404 (decisions/DEC-001.yaml)"
+    )
+
+
+def test_requirement_reference_accepts_existing_requirement() -> None:
+    requirement = Artifact(
+        kind="REQ",
+        data={"id": "REQ-001"},
+        source="requirements/REQ-001.yaml",
+    )
+    decision = Artifact(
+        kind="DEC",
+        data={"id": "DEC-001", "affected_items": ["REQ-001"]},
+        source="decisions/DEC-001.yaml",
+    )
+    index = ArtifactIndex.from_artifacts([requirement, decision])
+
+    assert find_missing_requirement_references([decision], index) == []
+
+
+def test_inv_001_preserves_legacy_scope_and_ignores_missing_decision_and_risk_refs() -> None:
+    decision = Artifact(
+        kind="DEC",
+        data={"id": "DEC-001", "affected_items": ["DEC-404", "RISK-404"]},
+        source="decisions/DEC-001.yaml",
+    )
+    index = ArtifactIndex.from_artifacts([decision])
+
+    assert find_missing_requirement_references([decision], index) == []
