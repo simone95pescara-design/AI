@@ -2,19 +2,20 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Requirement",
   "type": "object",
-  "required": ["id","status","title","requirement","verification_method"],
+  "required": ["id", "status", "title", "requirement", "verification_method"],
   "properties": {
-    "id": {"type":"string","pattern":"^REQ-[0-9]{3,}$"},
-    "status": {"enum":["PROPOSED","APPROVED","SUPERSEDED","DEPRECATED"]},
-    "title": {"type":"string","minLength":1},
-    "source": {"type":"string"},
-    "requirement": {"type":"string","minLength":1},
-    "rationale": {"type":"string"},
-    "constraints": {"type":"array"},
-    "acceptance_criteria": {"type":"array"},
-    "verification_method": {"type":"string","minLength":1},
-    "dependencies": {"type":"array"},
-    "related_decisions": {"type":"array"}
+    "id": {"type": "string", "pattern": "^REQ-[0-9]{3,}$"},
+    "status": {"enum": ["PROPOSED", "APPROVED", "SUPERSEDED", "DEPRECATED"]},
+    "title": {"type": "string", "minLength": 1},
+    "source": {"type": "string"},
+    "requirement": {"type": "string", "minLength": 1},
+    "rationale": {"type": "string"},
+    "constraints": {"type": "array"},
+    "acceptance_criteria": {"type": "array"},
+    "verification_method": {"type": "string", "minLength": 1},
+    "dependencies": {"type": "array"},
+    "related_decisions": {"type": "array"},
+    "superseded_by": {"type": ["string", "null"], "pattern": "^REQ-[0-9]{3,}$"}
   },
   "additionalProperties": false
 }
