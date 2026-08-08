@@ -7,6 +7,7 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from ai_governance.infrastructure.artifact_repository import load_artifact_documents
 from ai_governance.infrastructure.document_io import (
     load_document as infrastructure_load_document,
     load_json_schema,
@@ -64,27 +65,33 @@ def load_document(path: Path) -> Any:
 
 def load_artifacts(errors: list[str]) -> list[tuple[str, Path, dict[str, Any]]]:
     artifacts: list[tuple[str, Path, dict[str, Any]]] = []
-    for kind, root in ARTIFACT_ROOTS.items():
-        if not root.exists():
+    loaded, load_issues = load_artifact_documents(ARTIFACT_ROOTS, SUPPORTED_SUFFIXES)
+
+    for issue in load_issues:
+        fail(
+            "CHECK-003",
+            f"cannot parse {issue.path.relative_to(REPO)}: {issue.error}",
+            errors,
+        )
+
+    validators = {
+        kind: Draft202012Validator(load_schema(schema_path))
+        for kind, schema_path in SCHEMAS.items()
+    }
+
+    for artifact in loaded:
+        kind, path, data = artifact.kind, artifact.path, artifact.data
+        if not isinstance(data, dict):
+            fail("CHECK-003", f"artifact must be an object: {path.relative_to(REPO)}", errors)
             continue
-        schema = load_schema(SCHEMAS[kind])
-        validator = Draft202012Validator(schema)
-        for path in sorted(root.rglob("*")):
-            if not path.is_file() or path.suffix.lower() not in SUPPORTED_SUFFIXES:
-                continue
-            try:
-                data = load_document(path)
-            except Exception as exc:
-                fail("CHECK-003", f"cannot parse {path.relative_to(REPO)}: {exc}", errors)
-                continue
-            if not isinstance(data, dict):
-                fail("CHECK-003", f"artifact must be an object: {path.relative_to(REPO)}", errors)
-                continue
-            schema_errors = sorted(validator.iter_errors(data), key=lambda item: list(item.absolute_path))
-            for err in schema_errors:
-                location = ".".join(str(part) for part in err.absolute_path) or "<root>"
-                fail("CHECK-003", f"{path.relative_to(REPO)} [{location}]: {err.message}", errors)
-            artifacts.append((kind, path, data))
+        schema_errors = sorted(
+            validators[kind].iter_errors(data),
+            key=lambda item: list(item.absolute_path),
+        )
+        for err in schema_errors:
+            location = ".".join(str(part) for part in err.absolute_path) or "<root>"
+            fail("CHECK-003", f"{path.relative_to(REPO)} [{location}]: {err.message}", errors)
+        artifacts.append((kind, path, data))
     return artifacts
 
 
