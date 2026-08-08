@@ -11,7 +11,10 @@ from ai_governance.application.schema_validation import (
     validate_schema_definition,
 )
 from ai_governance.domain.artifacts import Artifact
-from ai_governance.domain.invariants import find_duplicate_ids
+from ai_governance.domain.invariants import (
+    find_approved_decisions_without_rationale,
+    find_duplicate_ids,
+)
 from ai_governance.infrastructure.artifact_mapping import domain_artifact
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
 from ai_governance.infrastructure.document_io import (
@@ -146,8 +149,10 @@ def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> lis
         status = data.get("status")
 
         if kind == "DEC":
-            if status == "APPROVED" and not nonempty(data.get("rationale")):
-                fail("INV-002", f"approved decision {item_id} has no rationale ({rel})", errors)
+            decision_artifact = Artifact(kind=kind, data=data, source=str(rel))
+            for finding in find_approved_decisions_without_rationale([decision_artifact]):
+                fail(finding.code, finding.message, errors)
+
             if status == "SUPERSEDED":
                 successor = data.get("superseded_by")
                 if not nonempty(successor):
