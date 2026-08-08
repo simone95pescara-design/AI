@@ -1,0 +1,36 @@
+id: DIA-001
+status: ROOT_CAUSE_CONFIRMED
+title: "State-transition and metamodel drift"
+date: "2026-08-08"
+observation: "The framework accumulated artifacts and state changes faster than its schemas, ownership rules, transition gates, and baseline promotion semantics were updated, producing schema drift, non-authoritative VER/QUEUE artifacts, stale state projection, and direct-main promotion risks."
+evidence:
+  - "PR #1 initially failed compliance because pre-existing baseline artifacts did not match active schemas."
+  - "VER-001 and QUEUE-001 existed before TR-MODEL-EXTEND defined activation requirements."
+  - "Transition Model V1 was promoted while its document header remained APPROVED_CANDIDATE and state/current.yaml still named DEC-001 as the sole baseline."
+  - "DEC-002 documents RC-00, RC-01 and RC-02 and was approved after review and CI."
+hypotheses:
+  - "Knowledge ownership ambiguity can create future projection drift when multiple artifacts represent the same fact."
+root_cause_status: CONFIRMED
+root_cause: "The framework previously defined artifact states and invariants more completely than governed transitions, metamodel activation, and candidate-to-baseline promotion. This allowed model/state changes to become persistent without a complete atomic alignment boundary."
+corrective_actions:
+  - "Adopt Transition Model V1 via DEC-002."
+  - "Repair pre-existing decision/requirement schema drift via PR #2."
+  - "Align project-state projection after promotion via PR #3."
+  - "Propose Operational Metamodel V1 via DEC-003."
+preventive_actions:
+  - "Require TR-MODEL-EXTEND before new artifact types become authoritative."
+  - "Use branch/PR/compliance promotion rather than direct writes for governance-significant changes."
+  - "Assign one authoritative owner category to each persistent fact and validate projections against owners."
+verification:
+  - "PR #2 governance compliance PASSED before merge."
+  - "PR #1 governance compliance PASSED on the approved candidate before merge."
+  - "PR #3 governance compliance PASSED before merge."
+residual_risk:
+  - "Operational Metamodel V1 is not yet approved or active."
+  - "Transition Model document header still requires a controlled correction from APPROVED_CANDIDATE to BASELINE/NORMATIVE."
+  - "Task owner identity semantics may need refinement beyond the current role-based proposal."
+related_tasks:
+  - TASK-003
+related_decisions:
+  - DEC-002
+  - DEC-003
