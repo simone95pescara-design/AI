@@ -191,6 +191,33 @@ def find_missing_requirement_references(
     return findings
 
 
+def find_done_tasks_with_failed_verification(
+    artifacts: Iterable[Artifact],
+) -> list[Finding]:
+    """Return INV-004 findings for DONE state tasks with FAILED verification."""
+
+    findings: list[Finding] = []
+    for artifact in artifacts:
+        if artifact.kind != "STATE":
+            continue
+        source = artifact.source or "<unknown>"
+        for task in artifact.data.get("tasks", []) or []:
+            if not isinstance(task, dict):
+                continue
+            if task.get("status") != "DONE" or task.get("verification_status") != "FAILED":
+                continue
+            task_id = task.get("id", "<unknown>")
+            findings.append(
+                Finding(
+                    code="INV-004",
+                    message=f"task {task_id} is DONE with FAILED verification ({source})",
+                    source=source,
+                    location="tasks",
+                )
+            )
+    return findings
+
+
 def find_duplicate_ids(artifacts: Iterable[Artifact]) -> list[Finding]:
     """Return INV-006 findings for duplicate persistent IDs.
 
