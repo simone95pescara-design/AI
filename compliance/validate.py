@@ -11,30 +11,19 @@ from ai_governance.infrastructure.document_io import (
     load_document as infrastructure_load_document,
     load_json_schema,
 )
+from ai_governance.infrastructure.repository_registry import (
+    SUPPORTED_DOCUMENT_SUFFIXES,
+    artifact_roots,
+    required_paths,
+    schema_paths,
+)
 
 REPO = Path(__file__).resolve().parents[1]
-REQUIRED = [
-    REPO / "AGENTS.md",
-    REPO / "governance" / "SPECIFICATION.md",
-    REPO / "governance" / "authority.md",
-    REPO / "governance" / "knowledge-policy.md",
-    REPO / "governance" / "response-protocol.md",
-    REPO / "governance" / "invariants.md",
-]
-SCHEMAS = {
-    "DEC": REPO / "schemas" / "decision.schema.json",
-    "REQ": REPO / "schemas" / "requirement.schema.json",
-    "RISK": REPO / "schemas" / "risk.schema.json",
-    "STATE": REPO / "schemas" / "state.schema.json",
-}
-ARTIFACT_ROOTS = {
-    "DEC": REPO / "decisions",
-    "REQ": REPO / "requirements",
-    "RISK": REPO / "risks",
-    "STATE": REPO / "state",
-}
+REQUIRED = required_paths(REPO)
+SCHEMAS = schema_paths(REPO)
+ARTIFACT_ROOTS = artifact_roots(REPO)
 ID_PATTERN = re.compile(r"\b(?:DEC|REQ|RISK)-\d{3,}\b")
-SUPPORTED_SUFFIXES = {".yaml", ".yml", ".json"}
+SUPPORTED_SUFFIXES = SUPPORTED_DOCUMENT_SUFFIXES
 
 
 def fail(code: str, message: str, errors: list[str]) -> None:
