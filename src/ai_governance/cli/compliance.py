@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from ai_governance.application.repository_compliance import evaluate_repository_compliance
-from ai_governance.domain.findings import Finding
 from ai_governance.infrastructure.repository_compliance_snapshot import (
     load_repository_compliance_snapshot,
 )
@@ -25,7 +25,7 @@ PASS_LINES = (
 )
 
 
-def render_finding(finding: Finding) -> str:
+def render_finding(finding: Any) -> str:
     """Render one structured finding without changing its semantics."""
 
     if finding.code == "CHECK-003" and finding.source and finding.location:
