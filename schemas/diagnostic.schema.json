@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Diagnostic",
+  "type": "object",
+  "required": ["id", "status", "title", "observation", "evidence", "root_cause_status"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^DIA-[0-9]{3,}$"},
+    "status": {"enum": ["OBSERVED", "INVESTIGATING", "HYPOTHESIS", "ROOT_CAUSE_CONFIRMED", "ROOT_CAUSE_UNKNOWN", "CLOSED_RESOLVED", "CLOSED_ACCEPTED_UNKNOWN", "CLOSED_NO_ACTION"]},
+    "title": {"type": "string", "minLength": 1},
+    "date": {"type": "string"},
+    "observation": {"type": "string", "minLength": 1},
+    "evidence": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "hypotheses": {"type": "array", "items": {"type": "string"}},
+    "root_cause_status": {"enum": ["UNKNOWN", "HYPOTHESIS", "CONFIRMED"]},
+    "root_cause": {"type": ["string", "null"]},
+    "corrective_actions": {"type": "array", "items": {"type": "string"}},
+    "preventive_actions": {"type": "array", "items": {"type": "string"}},
+    "verification": {"type": "array", "items": {"type": "string"}},
+    "residual_risk": {"type": "array", "items": {"type": "string"}},
+    "related_tasks": {"type": "array", "items": {"type": "string", "pattern": "^TASK-[0-9]{3,}$"}},
+    "related_decisions": {"type": "array", "items": {"type": "string", "pattern": "^DEC-[0-9]{3,}$"}}
+  },
+  "additionalProperties": false
+}
