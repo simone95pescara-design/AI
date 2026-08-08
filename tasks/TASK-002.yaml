@@ -2,7 +2,7 @@ id: TASK-002
 status: CANCELLED
 title: "Define autonomous-development readiness matrix"
 objective: "Define capability, prerequisite, maturity level R0-R4, acceptance test, automation potential, and required human gate for semi-autonomous software development."
-scope: "Readiness specification and matrix only."
+scope: "Historical executable-task representation before the work was deliberately deferred into QUEUE-001."
 baseline: "Governance V1.0 + Transition Model V1 / DEC-001 + DEC-002"
 authority: A2
 owner: null
@@ -13,9 +13,9 @@ blockers:
 acceptance_criteria: []
 verification_status: NOT_REQUIRED
 verification_refs: []
-queue_source: QUEUE-001
+queue_source: null
 related_requirements: []
 related_decisions:
   - DEC-002
 next_action: null
-cancellation_reason: "Migrated out of executable task lifecycle because the work is deliberately deferred and is authoritatively represented by QUEUE-001 until resume conditions are met."
+cancellation_reason: "Cancelled as executable work because the objective is deliberately deferred and is represented by QUEUE-001; if promoted later, QUEUE-001 must create/link a new executable TASK identity."
