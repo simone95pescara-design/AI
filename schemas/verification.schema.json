@@ -2,18 +2,30 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Verification",
   "type": "object",
-  "required": ["id", "status", "type", "baseline", "method", "evidence"],
+  "required": ["id", "status", "type", "baseline", "method", "evidence", "provenance"],
   "properties": {
     "id": {"type": "string", "pattern": "^VER-[0-9]{3,}$"},
     "status": {"enum": ["PLANNED", "RUNNING", "PASSED", "FAILED", "NOT_VERIFIED", "SUPERSEDED"]},
-    "type": {"type": "string", "minLength": 1},
+    "type": {"enum": ["VERIFICATION", "VALIDATION", "COLD_START", "COMPLIANCE", "TEST", "REVIEW"]},
     "date": {"type": "string"},
     "baseline": {"type": "string", "minLength": 1},
     "method": {"type": "string", "minLength": 1},
+    "provenance": {
+      "type": "object",
+      "required": ["target", "baseline_ref"],
+      "properties": {
+        "target": {"type": "string", "minLength": 1},
+        "baseline_ref": {"type": "string", "minLength": 1},
+        "executor": {"type": ["string", "null"]},
+        "executed_at": {"type": ["string", "null"]},
+        "reproducible_command": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
     "requirements": {"type": "array", "items": {"type": "string", "pattern": "^REQ-[0-9]{3,}$"}},
     "tasks": {"type": "array", "items": {"type": "string", "pattern": "^TASK-[0-9]{3,}$"}},
     "decisions": {"type": "array", "items": {"type": "string", "pattern": "^DEC-[0-9]{3,}$"}},
-    "evidence": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
     "summary": {"type": "string"},
     "limitations": {"type": "array", "items": {"type": "string"}},
     "superseded_by": {"type": ["string", "null"], "pattern": "^VER-[0-9]{3,}$"}
