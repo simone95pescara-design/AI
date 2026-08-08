@@ -10,20 +10,20 @@ completed:
   - "Repository Closure Audit merged through PR #27 with finite gap list RC-01..RC-18."
   - "Wave A closed truth/promotion integrity gaps RC-01, RC-02, RC-03 and RC-13."
   - "Wave B migrated repository compliance to an application use case with infrastructure snapshot adapters and thin CLI presentation."
-  - "Wave B defined the installable ai-governance-compliance entry point, moved package version from transitional 0.0.0 to internal 0.1.0, and removed compliance/validate.py."
+  - "Wave B defined the installable ai-governance-compliance entry point, moved package version from transitional 0.0.0 to internal 0.1.0, and removed the legacy compliance wrapper outside src/."
   - "Wave B completed the structured Finding contract with severity, rule and structured context while preserving existing observable validation contracts."
 in_progress:
-  - "Repository Engineering closure remediation remains active after Wave B."
+  - "Repository Engineering closure remediation is executing Wave C architecture enforcement."
   - "Functional expansion is frozen until the Repository Engineering V1 exit gate passes."
 blocked:
   - "Product Metamodel V2 implementation beyond candidate SYS/BEH schemas is blocked by Repository Engineering closure."
 open_issues:
-  - "Wave C remains: repository architecture enforcement and required-path alignment (RC-07, RC-12, RC-15, RC-16)."
-  - "Wave D remains: documentation, language, naming and candidate-contract normalization (RC-09, RC-10, RC-11, RC-14)."
+  - "Wave C is under verification: repository architecture enforcement and required-path alignment (RC-07, RC-12, RC-15, RC-16), with minimal prerequisite cleanup from RC-09 and RC-11."
+  - "Wave D remains: language normalization and candidate-contract normalization, plus any residual documentation cleanup (RC-09, RC-10, RC-14)."
   - "Wave E remains: current-baseline cold-start evidence and independent final closure audit (RC-17)."
-  - "Branch cleanup RC-18 remains final cleanup and includes historical/candidate branches and accidental noop-temp."
+  - "Branch cleanup RC-18 remains final cleanup and includes historical/candidate branches and accidental branches created during remediation."
 next_actions:
-  - "Complete Wave C without starting documentation normalization or SYS/BEH domain implementation."
-  - "After Wave C, require CI/test evidence before starting Wave D."
+  - "Require Wave C compliance and full test suite PASS before promotion."
+  - "After Wave C promotion, start only the remaining Wave D scope."
   - "Declare Repository Engineering V1 CLOSED/STABLE only after the exit gate in docs/repository-closure-audit.md passes."
 verification_status: PARTIAL
