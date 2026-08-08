@@ -2,23 +2,23 @@
 
 from __future__ import annotations
 
+from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-from ai_governance.application.post_promotion import BASELINE_DOCUMENT_RULES
-
 
 def load_post_promotion_snapshot(
     repository_root: Path,
+    document_paths: Collection[str],
 ) -> tuple[dict[str, str], dict[str, Any], set[str]]:
     """Load baseline-facing documents, current state and approved decision IDs."""
 
     documents = {
-        rule.path: (repository_root / rule.path).read_text(encoding="utf-8")
-        for rule in BASELINE_DOCUMENT_RULES
-        if (repository_root / rule.path).is_file()
+        path: (repository_root / path).read_text(encoding="utf-8")
+        for path in document_paths
+        if (repository_root / path).is_file()
     }
 
     state_path = repository_root / "state" / "current.yaml"
