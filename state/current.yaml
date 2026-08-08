@@ -10,19 +10,25 @@ completed:
   - "Persistent verification record VER-001 created for REQ-001 and REQ-002."
   - "Initial schemas, templates, compliance validator, governance tests, and GitHub Actions workflow established."
 in_progress:
-  - "Define readiness criteria and gaps for orderly semi-autonomous software development with minimal human intervention."
+  - "Investigate and align current repository/process inconsistencies before extending autonomous-development capabilities."
 blocked: []
 open_issues:
-  - "Autonomous software-development readiness criteria are not yet formally defined."
-  - "The execution lifecycle for planning, implementation, review, merge, deployment, rollback, and escalation is not yet complete."
+  - "The current system has not yet undergone a systematic diagnostic for drift, stale state, missed persistence, process inconsistencies, and root causes."
+  - "Observed inconsistencies must be investigated without assuming their cause in advance."
+  - "Autonomous-development readiness work is deferred in QUEUE-001 until diagnostic alignment is complete."
 next_actions:
-  - "Create an autonomous-development readiness model with mandatory prerequisites, maturity levels, and exit criteria."
-  - "Identify which missing capabilities must become governance rules, schemas, validators, workflows, or human approval gates."
-verification_status: PASSED
+  - "Inventory the current repository structure, normative artifacts, state, evidence, schemas, validator, tests, and workflow."
+  - "Compare declared governance with actual repository behavior and identify discrepancies."
+  - "Classify each finding as symptom, confirmed cause, hypothesis, unknown, or design gap."
+  - "For confirmed problems, identify both corrective action and preventive/root-cause action before closing them."
+verification_status: PARTIAL
 tasks:
   - id: "TASK-001"
     status: DONE
     verification_status: PASSED
   - id: "TASK-002"
+    status: TODO
+    verification_status: UNKNOWN
+  - id: "TASK-003"
     status: DOING
     verification_status: UNKNOWN
