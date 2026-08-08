@@ -1,0 +1,21 @@
+id: TASK-002
+status: CANCELLED
+title: "Define autonomous-development readiness matrix"
+objective: "Define capability, prerequisite, maturity level R0-R4, acceptance test, automation potential, and required human gate for semi-autonomous software development."
+scope: "Readiness specification and matrix only."
+baseline: "Governance V1.0 + Transition Model V1 / DEC-001 + DEC-002"
+authority: A2
+owner: null
+dependencies:
+  - TASK-003
+blockers:
+  - "Diagnostic alignment is not complete."
+acceptance_criteria: []
+verification_status: NOT_REQUIRED
+verification_refs: []
+queue_source: QUEUE-001
+related_requirements: []
+related_decisions:
+  - DEC-002
+next_action: null
+cancellation_reason: "Migrated out of executable task lifecycle because the work is deliberately deferred and is authoritatively represented by QUEUE-001 until resume conditions are met."
