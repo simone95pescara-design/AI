@@ -10,6 +10,8 @@ from ai_governance.application.schema_validation import (
     validate_artifacts,
     validate_schema_definition,
 )
+from ai_governance.domain.artifacts import Artifact
+from ai_governance.domain.invariants import find_duplicate_ids
 from ai_governance.infrastructure.artifact_mapping import domain_artifact
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
 from ai_governance.infrastructure.document_io import (
@@ -101,17 +103,18 @@ def load_artifacts(errors: list[str]) -> list[tuple[str, Path, dict[str, Any]]]:
 
 
 def check_duplicate_ids(artifacts: list[tuple[str, Path, dict[str, Any]]], errors: list[str]) -> None:
-    seen: dict[str, Path] = {}
-    for kind, path, data in artifacts:
-        if kind == "STATE":
-            continue
-        item_id = data.get("id")
-        if not isinstance(item_id, str):
-            continue
-        if item_id in seen and seen[item_id] != path:
-            fail("INV-006", f"duplicate ID {item_id}: {seen[item_id].relative_to(REPO)} and {path.relative_to(REPO)}", errors)
-        else:
-            seen[item_id] = path
+    """Compatibility wrapper delegating INV-006 to the domain invariant."""
+
+    domain_artifacts = [
+        Artifact(
+            kind=kind,
+            data=data,
+            source=str(path.relative_to(REPO)) if path.is_absolute() else str(path),
+        )
+        for kind, path, data in artifacts
+    ]
+    for finding in find_duplicate_ids(domain_artifacts):
+        fail(finding.code, finding.message, errors)
 
 
 def extract_references(value: Any) -> set[str]:
