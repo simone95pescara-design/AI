@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Bootstrap
+
+Any new AI agent or conversation joining this project MUST begin by reading this file and then follow the deterministic entry sequence defined in `BOOTSTRAP.md` before performing significant project work.
+
 ## Core rules
 
 1. Il repository è la memoria persistente e autorevole del progetto. Le conversazioni sono memoria di lavoro temporanea.
