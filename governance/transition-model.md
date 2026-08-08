@@ -1,7 +1,7 @@
-# Transition Model V1 — APPROVED CANDIDATE
+# Transition Model V1 — BASELINE
 
-Status: APPROVED_CANDIDATE
-Authority: this document becomes normative only after `DEC-002` is explicitly approved, all mandatory candidate checks pass, and the approved candidate is promoted to the designated baseline branch.
+Status: BASELINE
+Authority: normative under approved `DEC-002` after successful promotion to the designated baseline branch. Material changes to this model require a new governed candidate and explicit approval/promotion.
 
 ## Purpose
 
