@@ -61,9 +61,8 @@ def test_decision_supersession_must_be_reciprocal():
 
 def test_done_task_cannot_have_failed_verification():
     errors = validator.validate_semantics([
-        artifact("STATE", "state/current.yaml", {
-            "status": "ACTIVE",
-            "tasks": [{"id": "TASK-001", "status": "DONE", "verification_status": "FAILED"}],
+        artifact("TASK", "tasks/TASK-001.yaml", {
+            "id": "TASK-001", "status": "DONE", "verification_status": "FAILED"
         })
     ])
     assert any(error.startswith("INV-004:") for error in errors)
@@ -76,3 +75,48 @@ def test_requirement_references_must_resolve():
         })
     ])
     assert any(error.startswith("INV-001:") for error in errors)
+
+
+def test_passed_verification_requires_evidence():
+    errors = validator.validate_semantics([
+        artifact("VER", "verification/VER-001.yaml", {
+            "id": "VER-001", "status": "PASSED", "evidence": []
+        })
+    ])
+    assert any(error.startswith("INV-011:") for error in errors)
+
+
+def test_doing_task_requires_owner():
+    errors = validator.validate_semantics([
+        artifact("TASK", "tasks/TASK-003.yaml", {
+            "id": "TASK-003", "status": "DOING", "verification_status": "PARTIAL", "owner": None
+        })
+    ])
+    assert any(error.startswith("INV-012:") for error in errors)
+
+
+def test_promoted_queue_requires_task_target():
+    errors = validator.validate_semantics([
+        artifact("QUEUE", "queue/QUEUE-001.yaml", {
+            "id": "QUEUE-001", "status": "PROMOTED", "promoted_to": "TASK-999"
+        })
+    ])
+    assert any(error.startswith("INV-013:") for error in errors)
+
+
+def test_confirmed_diagnostic_requires_root_cause():
+    errors = validator.validate_semantics([
+        artifact("DIA", "diagnostics/DIA-001.yaml", {
+            "id": "DIA-001", "status": "ROOT_CAUSE_CONFIRMED", "root_cause_status": "CONFIRMED", "root_cause": None
+        })
+    ])
+    assert any(error.startswith("INV-014:") for error in errors)
+
+
+def test_state_projection_references_must_resolve():
+    errors = validator.validate_semantics([
+        artifact("STATE", "state/current.yaml", {
+            "status": "ACTIVE", "active_tasks": ["TASK-999"], "queued_work": [], "open_diagnostics": []
+        })
+    ])
+    assert any(error.startswith("INV-015:") for error in errors)
