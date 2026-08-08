@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Collection
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -58,8 +58,9 @@ def validate_post_promotion(
             )
             continue
 
+        header = "\n".join(content.splitlines()[:6])
         for marker in rule.required:
-            if marker not in content:
+            if marker not in header:
                 findings.append(
                     Finding(
                         code="POST-001",
@@ -68,7 +69,7 @@ def validate_post_promotion(
                     )
                 )
         for marker in rule.forbidden:
-            if marker in content:
+            if marker in header:
                 findings.append(
                     Finding(
                         code="POST-001",
