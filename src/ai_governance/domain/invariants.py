@@ -111,6 +111,54 @@ def find_invalid_supersession_successors(
     return findings
 
 
+def find_nonreciprocal_decision_supersessions(
+    artifacts: Iterable[Artifact],
+    index: ArtifactIndex,
+) -> list[Finding]:
+    """Return INV-007 findings for non-reciprocal DEC supersession links."""
+
+    findings: list[Finding] = []
+    for artifact in artifacts:
+        if artifact.kind != "DEC":
+            continue
+
+        source = artifact.source or "<unknown>"
+        item_id = artifact.artifact_id or source
+        for predecessor_id in artifact.data.get("supersedes", []) or []:
+            predecessor = index.get(predecessor_id) if isinstance(predecessor_id, str) else None
+            if predecessor is None or predecessor.kind != "DEC":
+                findings.append(
+                    Finding(
+                        code="INV-007",
+                        message=(
+                            f"decision {item_id} supersedes missing decision {predecessor_id} "
+                            f"({source})"
+                        ),
+                        source=source,
+                        location="supersedes",
+                    )
+                )
+                continue
+
+            if (
+                predecessor.data.get("status") != "SUPERSEDED"
+                or predecessor.data.get("superseded_by") != item_id
+            ):
+                findings.append(
+                    Finding(
+                        code="INV-007",
+                        message=(
+                            f"decision {item_id} supersedes {predecessor_id}, but reciprocal "
+                            "supersession is not recorded"
+                        ),
+                        source=source,
+                        location="supersedes",
+                    )
+                )
+
+    return findings
+
+
 def find_duplicate_ids(artifacts: Iterable[Artifact]) -> list[Finding]:
     """Return INV-006 findings for duplicate persistent IDs.
 
