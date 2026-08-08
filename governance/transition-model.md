@@ -1,6 +1,6 @@
-# Transition Model V1 — PROPOSED
+# Transition Model V1 — APPROVED CANDIDATE
 
-Status: PROPOSED
+Status: APPROVED_CANDIDATE
 Authority: this document becomes normative only after `DEC-002` is explicitly approved, all mandatory candidate checks pass, and the approved candidate is promoted to the designated baseline branch.
 
 ## Purpose
@@ -305,101 +305,103 @@ FROM: `VERIFIED`
 TO: `VALIDATED`
 
 Trigger:
-- request to establish requirement satisfaction.
+- request to validate a verified result against an approved requirement.
 
 Preconditions:
-- relevant approved requirement and acceptance criteria are known;
-- technical verification evidence exists;
-- verification target is compatible with the requirement baseline.
+- relevant requirement and acceptance criteria are known;
+- technical verification evidence exists and is attributable to the same candidate/baseline.
 
 Required authority:
-- validation authority required by the affected requirement/project gate.
+- sufficient authority to evaluate acceptance criteria; validation does not authorize baseline promotion.
 
 Required evidence:
 - explicit comparison of result against acceptance criteria.
 
 Actions:
-- evaluate evidence against requirement criteria.
+- evaluate requirement satisfaction.
 
 Atomic changes:
-- validation result and required requirement/status projections.
+- validation result and requirement-verification linkage.
 
 Postconditions:
 - requirement satisfaction result is persisted.
 
 Validation:
-- acceptance criteria are individually accounted for or explicitly unresolved.
+- evidence covers mandatory acceptance criteria.
 
 Failure behavior:
 - remain VERIFIED but NOT VALIDATED, or record validation failure.
 
 Persistence:
-- validation evidence linked to requirement and verification evidence.
+- authoritative validation/verification record after its model is activated.
 
 Audit:
-- requirement version, evidence, evaluator, result.
+- requirement, acceptance criteria, evidence, result, candidate/baseline.
 
-Rollback: NOT_APPLICABLE; later evidence produces a new validation event.
-Migration: depends on activated verification/validation artifact model.
-External effects: NOT_APPLICABLE.
-Human gate: when requirement acceptance requires explicit human/project-owner acceptance.
+Rollback: NOT_APPLICABLE; later evidence creates a new validation event.
+Migration: depends on verification-model activation.
+External effects: NOT_APPLICABLE unless validation tooling causes them.
+Human gate: only where acceptance criteria require human acceptance.
 
-### TR-BASELINE-PROMOTE v1 — Candidate to approved baseline
+### TR-BASELINE-PROMOTE v1 — Approved candidate to baseline
 
 FROM: `CANDIDATE` or `APPROVED_CANDIDATE`
 TO: `BASELINE`
 
 Trigger:
-- explicit promotion request/merge action.
+- promotion request after candidate review.
 
 Preconditions:
-- candidate identifier is immutable/identifiable;
-- required tests/compliance checks pass against the candidate merged with current baseline where applicable;
-- significant contained decisions are approved;
+- candidate baseline is uniquely identifiable;
+- required tests/compliance checks pass against the current candidate;
+- all decisions required for contained changes are `APPROVED`;
 - no unresolved mandatory invariant violation exists;
-- required human gate is satisfied;
+- aggregate authority/human gates are satisfied;
+- baseline target branch/ref is identified;
 - rollback/recovery is defined when required;
-- baseline has not changed incompatibly since candidate validation, or the candidate has been revalidated against the new baseline.
+- candidate is based on or reconciled with the current baseline so promotion does not silently discard intervening baseline changes.
 
 Required authority:
-- highest authority required by any contained mandatory transition or affected operation.
+- highest authority required by any contained transition or affected high-impact operation.
 
 Required evidence:
-- candidate identifier;
+- candidate/head identifier;
 - current baseline identifier;
-- compliance result;
-- test/validation result;
-- approval evidence when required.
+- successful compliance result for the promotion candidate;
+- required test/validation results;
+- approval evidence for contained decisions;
+- reconciliation evidence when baseline changed during candidate work.
 
 Actions:
-- promote candidate through the designated baseline mechanism.
+- promote the approved candidate through the designated merge/promotion mechanism.
 
 Atomic changes:
-- baseline ref/pointer moves to promoted candidate;
-- project-state projection is updated as part of or immediately after the same logical promotion;
-- superseded baseline remains reconstructible through version history.
+- designated baseline ref moves to promoted candidate result;
+- baseline-facing project projection is updated as part of the promotion or an immediately required post-promotion transition;
+- superseded baseline remains reconstructible in version history.
 
 Postconditions:
-- designated baseline ref represents the approved state;
-- mandatory checks remain satisfied for the promoted baseline;
-- candidate content is now normative according to governance precedence.
+- designated baseline ref represents the promoted state;
+- promoted decisions/governance become authoritative only now;
+- mandatory checks correspond to the promoted candidate;
+- no required candidate content remains only on the working branch.
 
 Validation:
-- verify actual baseline ref/commit and mandatory post-merge checks if required.
+- verify resulting baseline commit/ref and required post-promotion state.
 
 Failure behavior:
-- existing baseline remains authoritative; candidate remains non-baseline and actual partial state is recorded.
+- candidate remains non-baseline; existing baseline remains authoritative.
 
 Persistence:
-- merge/promotion record, relevant approvals, validation evidence and updated state projection.
+- merge/promotion history, baseline identifier, related decision/verification links.
 
 Audit:
-- source candidate, previous baseline, promoted baseline, checks, approvals.
+- source candidate, prior baseline, resulting baseline, approvals, CI/check results.
 
-Rollback: explicit baseline recovery/revert transition required if promotion must be undone.
-Migration: NOT_APPLICABLE.
-External effects: baseline branch/ref mutation and downstream effects triggered by it.
-Human gate: required whenever aggregate authority or branch policy requires it.
+Rollback: explicit revert/rollback transition; history remains reconstructible.
+Migration: NOT_APPLICABLE unless contained transitions require migration.
+External effects: baseline branch/ref mutation; downstream automation may be triggered and must be considered in impact analysis.
+Human gate: according to aggregate authority; governance changes require explicit approval.
 
 ### TR-MODEL-EXTEND v1 — Activate a new artifact type
 
@@ -410,160 +412,153 @@ Trigger:
 - need for a new persistent artifact type or lifecycle concept.
 
 Preconditions:
-- purpose and authoritative ownership are defined;
-- lifecycle/states are defined;
+- purpose is defined;
+- authoritative ownership/source-of-truth semantics are defined;
+- lifecycle/states and transitions are defined where applicable;
 - relationships to existing artifact types are defined;
-- source-of-truth semantics are defined;
 - migration/backward-compatibility impact is assessed;
-- mandatory metamodel components are identified using the applicability rules below.
+- mandatory metamodel components for this artifact class are explicitly identified.
 
 Required authority:
-- A3 minimum because activation changes project governance/metamodel; stricter authority applies if the type governs critical operations.
+- A3 because this changes the project governance/metamodel; higher authority if security/data/production impact requires it.
 
-Required evidence — always mandatory:
+Required evidence:
+Mandatory for every new persistent artifact type:
 - normative definition;
-- ownership/source-of-truth rule;
-- lifecycle/state definition;
-- relationship definition;
-- invariants or an explicit determination that no new invariant is required;
-- compliance/validator impact assessment;
-- bootstrap/discovery impact assessment;
+- ownership/source-of-truth definition;
+- lifecycle/status semantics;
+- relationship/discovery definition;
+- invariant impact assessment;
+- validator/compliance impact assessment;
+- bootstrap/cold-start impact assessment;
 - migration/backward-compatibility assessment;
-- validation showing all mandatory components are coherent.
+- successful validation of the complete metamodel change.
 
-Required evidence — conditional:
-- machine schema: MUST exist when instances are machine-structured and schema validation is feasible;
-- template/example: MUST exist when agents/humans need a canonical creation format;
-- validator implementation: MUST exist for deterministic enforceable rules; otherwise the rule must be classified non-enforceable/observable;
-- automated tests: MUST exist for implemented deterministic validation behavior;
-- registry/index update: MUST exist when discovery is not already deterministic without it.
+Mandatory when applicable:
+- machine-readable schema for structured machine-validated artifacts;
+- canonical template/example for repeatable authored artifacts;
+- automated validator checks for deterministic invariants;
+- automated tests for enforceable rules;
+- migration tooling for existing authoritative instances.
+
+When a conditionally mandatory component is not applicable, the activation record MUST explain why.
 
 Actions:
-- introduce all mandatory metamodel components as one candidate change.
+- implement all mandatory metamodel components as one governed candidate change.
 
 Atomic changes:
-- all mandatory model components are promoted together; no authoritative instance may precede model activation.
+- all components required for authoritative use are promoted in the same baseline promotion boundary.
 
 Postconditions:
 - artifact type is officially `MODEL_ACTIVE`;
-- agents may create authoritative production instances;
-- validators and discovery mechanisms understand the type where required.
+- authoritative instances may now be created;
+- validators/discovery/bootstrap understand the type where required;
+- no competing source-of-truth semantics remain unresolved.
 
 Validation:
-- metamodel completeness checklist and all deterministic compliance tests pass.
+- metamodel activation acceptance checks and related automated tests pass.
 
 Failure behavior:
 - type remains `CONCEPT_PROPOSED`;
-- instances MUST NOT be treated as authoritative.
+- production instances MUST NOT be treated as authoritative.
 
 Persistence:
-- normative model definition and required supporting components.
+- governance definition and activation evidence; schema/template/tests where applicable.
 
 Audit:
-- rationale, owner, lifecycle, components, migration, checks, activating baseline.
+- reason, owner, lifecycle, impacted components, migration decision, verification.
 
-Rollback: retiring or replacing an active type requires an explicit model-change transition preserving migration/history.
-Migration: mandatory assessment; migration plan required when existing data/artifacts are affected.
-External effects: NOT_APPLICABLE unless model activation changes external integrations.
-Human gate: A3 approval minimum.
-
-This transition directly addresses RC-01.
+Rollback: deactivate only through an explicit governance transition; existing instances must be migrated, retained as historical/non-authoritative, or retired explicitly.
+Migration: REQUIRED assessment; implementation when existing data/artifacts require it.
+External effects: depends on affected tooling/workflows.
+Human gate: explicit A3 approval required.
 
 ### TR-DIAG-CLOSE v1 — Close a diagnostic finding
 
 FROM: `OBSERVED`, `HYPOTHESIS`, or `ROOT_CAUSE_CONFIRMED`
-TO: one of `CLOSED_RESOLVED`, `CLOSED_ACCEPTED_UNKNOWN`, `CLOSED_DEFERRED`
+TO: `CLOSED_RESOLVED`, `CLOSED_ACCEPTED_UNKNOWN`, or `CLOSED_NO_ACTION`
 
 Trigger:
-- request to close or disposition a diagnostic finding.
+- request to close a diagnostic finding.
 
 Preconditions:
-- observation is recorded;
+- original observation is recorded;
 - unsupported hypotheses are not represented as causes;
-- known evidence is recorded;
+- root cause is either confirmed or explicitly remains UNKNOWN;
 - corrective action is identified when needed;
 - preventive/root-cause action is identified when applicable;
-- unresolved unknowns/risks are explicit.
+- verification of corrective/preventive result exists, or closure explicitly records why residual uncertainty is accepted.
 
 Required authority:
-- authority appropriate to accept residual risk or close the affected issue.
+- authority sufficient to accept residual risk/unknowns; higher authority where affected scope requires it.
 
 Required evidence:
-- closure outcome and rationale;
-- verification evidence for `CLOSED_RESOLVED`;
-- explicit accepted unknown/risk for `CLOSED_ACCEPTED_UNKNOWN`;
-- tracked follow-up/defer reason for `CLOSED_DEFERRED`.
+- observation/evidence;
+- root cause status;
+- corrective/preventive action outcome or explicit no-action/accepted-unknown rationale;
+- residual risk statement.
 
 Actions:
-- assign explicit closure outcome without rewriting diagnostic history.
+- classify closure outcome and link follow-up work.
 
 Atomic changes:
-- diagnostic state, residual risk/unknown references, follow-up links.
+- diagnostic status, closure rationale, residual risks/unknowns, follow-up linkage.
 
 Postconditions:
-- closure reason is explicit;
-- residual risks/unknowns remain visible;
-- related follow-up work is tracked where applicable.
+- `CLOSED_RESOLVED`: root cause/correction is verified enough for closure;
+- `CLOSED_ACCEPTED_UNKNOWN`: root cause remains UNKNOWN and residual uncertainty is explicitly accepted by sufficient authority;
+- `CLOSED_NO_ACTION`: evidence supports that no corrective action is required;
+- open follow-up remains tracked separately.
 
 Validation:
-- closure outcome requirements are satisfied.
+- closure category requirements are satisfied.
 
 Failure behavior:
 - finding remains open.
 
 Persistence:
-- authoritative diagnostic artifact only after the diagnostic artifact type completes `TR-MODEL-EXTEND`.
+- authoritative diagnostic artifact after diagnostic artifact type completes `TR-MODEL-EXTEND`.
 
 Audit:
-- observations, hypotheses, tests, evidence, conclusion, actions, closure authority.
+- observation, hypotheses tested, root-cause status, action, evidence, closure authority.
 
-Rollback: reopening requires an explicit diagnostic-reopen transition preserving closure history.
-Migration: current conversational diagnostics remain evidence input until a diagnostic artifact model is activated.
-External effects: NOT_APPLICABLE.
-Human gate: required when accepting material residual risk/unknown beyond delegated authority.
+Rollback: reopen only through explicit diagnostic transition if new evidence invalidates closure.
+Migration: existing conversational findings may be migrated when diagnostic model is activated.
+External effects: NOT_APPLICABLE unless corrective actions include them.
+Human gate: required when accepting material unresolved risk/unknowns beyond agent authority.
 
-## Knowledge ownership principle — proposed
+## Knowledge ownership principle
 
 Each persistent fact SHOULD have one authoritative owner category. Other files MAY project or summarize that fact but MUST NOT become competing authorities.
 
-Initial ownership proposal:
+Initial ownership:
 
-- `requirements/` owns requirement definitions and approval/lifecycle status;
-- `decisions/` owns decision definitions and approval/lifecycle status;
-- `verification/` may own formal verification results only after the verification artifact type is activated through `TR-MODEL-EXTEND`;
-- `queue/` may own deferred-work records only after the queue artifact type is activated through `TR-MODEL-EXTEND`;
+- `requirements/` owns requirement definitions and approval/status semantics;
+- `decisions/` owns decision definitions and approval/status semantics;
+- `verification/` is intended to own formal verification/validation results only after that artifact type is activated through `TR-MODEL-EXTEND`;
+- `queue/` is intended to own deferred-work records only after that artifact type is activated through `TR-MODEL-EXTEND`;
 - task lifecycle ownership remains UNKNOWN and MUST be decided before task transitions become enforceable;
-- `state/current.yaml` is proposed as a current-state projection and MUST NOT override facts owned by an authoritative source category.
+- `state/current.yaml` is a current-state projection and MUST NOT override authoritative facts owned by an activated artifact category.
 
-Where two representations conflict, the authoritative owner must prevail and the projection conflict must be reported rather than silently reconciled.
+Projection inconsistency MUST be treated as a consistency defect rather than resolved by arbitrary source selection.
 
 ## Migration rule
 
-Approval of this model does NOT automatically validate existing `VER-*`, `QUEUE-*`, or future unsupported artifact types. After normative promotion, each unsupported type MUST undergo `TR-MODEL-EXTEND` or be explicitly migrated/retired. Until then, its existing instances are non-authoritative evidence only.
-
-## Promotion rule for this proposal
-
-`DEC-002` approval and Transition Model activation are separate events:
-
-1. reviewer/human approval may transition `DEC-002` from `PROPOSED` to `APPROVED` on the candidate branch;
-2. mandatory compliance/review checks must pass against the current baseline;
-3. the candidate may then undergo `TR-BASELINE-PROMOTE` through merge into the designated baseline branch;
-4. only after successful promotion does this document become normative.
-
-If baseline `main` changes before promotion, the candidate MUST be re-evaluated/revalidated against the updated baseline when the change could affect correctness.
+Promotion of this model does NOT automatically activate existing `VER-*`, `QUEUE-*`, or future diagnostic artifact types. Existing unsupported artifact types MUST undergo `TR-MODEL-EXTEND`, be migrated into an activated model, or be explicitly retired/non-authoritative.
 
 ## Acceptance criteria for Transition Model V1
 
-Before `DEC-002` may be approved, reviewers MUST verify that:
+Before promotion to baseline, reviewers MUST verify that:
 
-1. RC-00 is addressed by a generic transition contract rather than local patches;
-2. RC-01 is prevented by `TR-MODEL-EXTEND`;
-3. RC-02 is addressed by explicit WORKING/CANDIDATE/BASELINE planes and `TR-BASELINE-PROMOTE`;
-4. failure paths preserve actual current state;
-5. H-03 is not silently resolved where evidence is insufficient;
-6. mandatory versus conditional metamodel components are explicit;
-7. transition definition versioning and composed transitions are governed;
-8. non-active artifact types cannot become authoritative;
-9. decision approval is distinct from normative baseline promotion;
-10. existing Governance V1.0 invariants remain compatible or required changes are explicitly identified;
-11. implementation/migration work beyond this candidate model is deferred until normative promotion.
+1. RC-00 is addressed by a generic transition contract rather than local patches.
+2. RC-01 is prevented by `TR-MODEL-EXTEND`.
+3. RC-02 is addressed by `TR-BASELINE-PROMOTE` and the working/candidate/baseline distinction.
+4. Failure paths preserve actual state.
+5. H-03 is not silently resolved where evidence is insufficient; task ownership remains explicit UNKNOWN.
+6. Governance-significant transition fields are mandatory or explicitly NOT_APPLICABLE.
+7. Transition definitions have lifecycle/version semantics.
+8. Composed changes have aggregate authority and failure semantics.
+9. Non-active artifact types cannot become authoritative.
+10. Human approval and baseline promotion are distinct events.
+11. Candidate compliance and required tests pass against the candidate to be promoted.
+12. Existing Governance V1.0 invariants remain compatible or required changes are explicitly identified.
