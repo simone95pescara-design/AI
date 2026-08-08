@@ -1,7 +1,7 @@
-# Product Metamodel V2 — PROPOSTA
+# Product Metamodel V2 — APPROVED
 
-Stato: PROPOSTO
-Autorità: diventa normativo solo dopo approvazione esplicita di `DEC-005`, verifica del candidate e promozione in baseline.
+Stato: APPROVED
+Autorità: approvato da `DEC-005`; diventa baseline normativa con la promozione della PR #25 su `main`. L'approvazione autorizza la direzione del metamodel e la progettazione dei candidate schema/contratti, ma non attiva automaticamente nuovi artifact type.
 
 ## 1. Scopo
 
@@ -112,7 +112,7 @@ Il mapping è verificabile ma non deve duplicare contenuto del codice. Il reposi
 
 Product Metamodel V2 non attiva automaticamente `TASK`, `VER`, `DIA` o `QUEUE`.
 
-La direzione proposta è:
+La direzione approvata è:
 
 - `VER`: KEEP, da ridisegnare tecnicamente e attivare come owner della verification evidence;
 - `TASK`: REDESIGN, da attivare dopo che il task può riferirsi a delta `SYS/BEH` determinati;
@@ -120,7 +120,7 @@ La direzione proposta è:
 - `QUEUE`: KEEP/REDESIGN, attivazione indipendente quando serve deferred work persistente;
 - `STATE`: resta proiezione non proprietaria.
 
-È vietata l'attivazione atomica obbligatoria dei quattro artifact type solo per ragioni storiche.
+È vietata l'attivazione atomica obbligatoria dei quattro artifact type solo per ragioni storiche. La PR #4 è superseded come proposta monolitica; i concetti utili restano input storico per attivazioni future indipendenti.
 
 ## 8. Riferimenti tipizzati
 
@@ -175,7 +175,7 @@ Il metamodel deve poter rappresentare, senza nuovi artifact type ad hoc, almeno 
 
 Se questo micro-slice richiede conoscenza critica lasciata solo in chat o codice, la V2 non è ancora pronta.
 
-## 12. Sequenza di attivazione proposta
+## 12. Sequenza di attivazione approvata
 
 Nessun big-bang.
 
@@ -189,9 +189,9 @@ Nessun big-bang.
 8. attivare poi `VER` e `TASK` nelle forme ridisegnate, indipendentemente;
 9. `DIA` e `QUEUE` restano attivazioni separate quando giustificate.
 
-## 13. Criteri di accettazione di DEC-005
+## 13. Decisione approvata
 
-L'approvazione deve accettare esplicitamente:
+Con `DEC-005` sono approvati esplicitamente:
 
 - distinzione tra metamodel operativo del progetto e metamodel del prodotto;
 - introduzione minima di soli `SYS` e `BEH` come nuovi owner di prodotto;
@@ -204,4 +204,4 @@ L'approvazione deve accettare esplicitamente:
 - attivazione incrementale e non atomica di `SYS/BEH/VER/TASK/DIA/QUEUE`;
 - micro vertical slice trading come prova di completezza prima dell'attivazione finale.
 
-L'approvazione di questo documento autorizza la direzione del metamodel e la progettazione dei candidate schema/contratti. Non attiva automaticamente nuovi artifact type né autorizza la generazione autonoma di un trading system reale.
+Questa approvazione autorizza la direzione del metamodel e la progettazione dei candidate schema/contratti. Non attiva automaticamente nuovi artifact type né autorizza la generazione autonoma di un trading system reale.
