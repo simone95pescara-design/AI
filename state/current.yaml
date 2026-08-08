@@ -1,0 +1,22 @@
+project: "AI Project Governance Framework"
+baseline: "Governance V1.0 / DEC-001"
+status: ACTIVE
+updated_at: "2026-08-08"
+completed:
+  - "Core governance files established."
+  - "Governance V1.0 explicitly approved and recorded as DEC-001."
+  - "Cold-start reconstructibility requirement recorded as REQ-001."
+  - "Initial schemas, templates, compliance validator, governance tests, and GitHub Actions workflow established."
+in_progress:
+  - "End-to-end cold-start validation of REQ-001."
+blocked: []
+open_issues:
+  - "A cold-start test has not yet been executed and recorded as evidence."
+next_actions:
+  - "Execute a cold-start review using only repository contents."
+  - "Record the result against REQ-001 acceptance criteria."
+verification_status: PARTIAL
+tasks:
+  - id: "TASK-001"
+    status: DOING
+    verification_status: PARTIAL
