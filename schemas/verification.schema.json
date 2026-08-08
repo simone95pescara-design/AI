@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Verification",
+  "type": "object",
+  "required": ["id", "status", "type", "baseline", "method", "evidence"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^VER-[0-9]{3,}$"},
+    "status": {"enum": ["PLANNED", "RUNNING", "PASSED", "FAILED", "NOT_VERIFIED", "SUPERSEDED"]},
+    "type": {"type": "string", "minLength": 1},
+    "date": {"type": "string"},
+    "baseline": {"type": "string", "minLength": 1},
+    "method": {"type": "string", "minLength": 1},
+    "requirements": {"type": "array", "items": {"type": "string", "pattern": "^REQ-[0-9]{3,}$"}},
+    "tasks": {"type": "array", "items": {"type": "string", "pattern": "^TASK-[0-9]{3,}$"}},
+    "decisions": {"type": "array", "items": {"type": "string", "pattern": "^DEC-[0-9]{3,}$"}},
+    "evidence": {"type": "array", "items": {"type": "string"}},
+    "summary": {"type": "string"},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "superseded_by": {"type": ["string", "null"], "pattern": "^VER-[0-9]{3,}$"}
+  },
+  "additionalProperties": false
+}
