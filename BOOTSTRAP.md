@@ -11,14 +11,21 @@ The repository must be sufficient to reconstruct operational context without acc
 Before performing significant project work, the agent MUST:
 
 1. Read `AGENTS.md`.
-2. Read `governance/SPECIFICATION.md` when needed to resolve normative detail, authority, ambiguity, or conflict.
-3. Read `state/current.yaml` to establish the current project baseline, status, open work, and next actions.
+2. Read `governance/SPECIFICATION.md` and `governance/transition-model.md` when needed to resolve normative detail, authority, ambiguity, conflict, or state transitions.
+3. Read `state/current.yaml` to establish the current project baseline and discover active operational artifact IDs.
 4. Read active approved requirements under `requirements/` relevant to the current task.
 5. Read active approved decisions under `decisions/` relevant to the current task.
-6. Identify any additional governance policy applicable to the requested work.
-7. Check for contradictions, stale information, unresolved blockers, and missing critical context.
-8. Establish the baseline on which the work will be performed.
-9. Only then begin significant execution.
+6. For IDs projected by state, read the authoritative owner artifacts:
+   - `tasks/TASK-*.yaml` for executable task lifecycle;
+   - `queue/QUEUE-*.yaml` for deliberately deferred work;
+   - `diagnostics/DIA-*.yaml` for open diagnostics/root-cause work;
+   - `verification/VER-*.yaml` for verification/validation evidence linked by relevant tasks or requirements.
+7. Identify any additional governance policy applicable to the requested work.
+8. Check for contradictions between projections and authoritative owner artifacts, stale information, unresolved blockers, and missing critical context.
+9. Establish the baseline on which the work will be performed.
+10. Only then begin significant execution.
+
+Until `DEC-003` is approved and promoted, the operational artifact ownership in step 6 is candidate behavior and existing VER/QUEUE/TASK/DIA artifacts MUST NOT be treated as authoritative solely because they exist on a candidate branch.
 
 ## Bootstrap assessment
 
@@ -28,7 +35,11 @@ When explicitly asked to confirm bootstrap, the agent SHOULD report concisely:
 - current status;
 - relevant approved requirements;
 - relevant approved decisions;
-- blockers or conflicts;
+- active task IDs and blockers;
+- open diagnostic IDs;
+- queued work IDs;
+- relevant verification evidence;
+- conflicts/stale projections;
 - next action.
 
 The agent MUST NOT claim to have read or verified repository information it did not actually access.
