@@ -5,22 +5,17 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from ai_governance.application.governance_validation import (
+    validate_governance_artifacts,
+    validate_semantics as application_validate_semantics,
+)
 from ai_governance.application.schema_validation import (
     build_validators,
     validate_artifacts,
     validate_schema_definition,
 )
-from ai_governance.domain.artifact_index import ArtifactIndex
 from ai_governance.domain.artifacts import Artifact
-from ai_governance.domain.invariants import (
-    find_approved_decisions_without_rationale,
-    find_approved_requirements_without_verification_method,
-    find_done_tasks_with_failed_verification,
-    find_duplicate_ids,
-    find_invalid_supersession_successors,
-    find_missing_requirement_references,
-    find_nonreciprocal_decision_supersessions,
-)
+from ai_governance.domain.invariants import find_duplicate_ids
 from ai_governance.domain.references import extract_persistent_reference_ids
 from ai_governance.infrastructure.artifact_mapping import domain_artifact
 from ai_governance.infrastructure.artifact_repository import load_artifact_documents
@@ -111,10 +106,10 @@ def load_artifacts(errors: list[str]) -> list[tuple[str, Path, dict[str, Any]]]:
     return artifacts
 
 
-def check_duplicate_ids(artifacts: list[tuple[str, Path, dict[str, Any]]], errors: list[str]) -> None:
-    """Compatibility wrapper delegating INV-006 to the domain invariant."""
-
-    domain_artifacts = [
+def _domain_artifacts(
+    artifacts: list[tuple[str, Path, dict[str, Any]]],
+) -> list[Artifact]:
+    return [
         Artifact(
             kind=kind,
             data=data,
@@ -122,7 +117,11 @@ def check_duplicate_ids(artifacts: list[tuple[str, Path, dict[str, Any]]], error
         )
         for kind, path, data in artifacts
     ]
-    for finding in find_duplicate_ids(domain_artifacts):
+
+
+def check_duplicate_ids(artifacts: list[tuple[str, Path, dict[str, Any]]], errors: list[str]) -> None:
+    """Compatibility wrapper delegating INV-006 to the domain invariant."""
+    for finding in find_duplicate_ids(_domain_artifacts(artifacts)):
         fail(finding.code, finding.message, errors)
 
 
@@ -132,39 +131,11 @@ def extract_references(value: Any) -> set[str]:
 
 
 def validate_semantics(artifacts: list[tuple[str, Path, dict[str, Any]]]) -> list[str]:
-    errors: list[str] = []
-    domain_artifacts: list[Artifact] = []
-    for kind, path, data in artifacts:
-        rel = path.relative_to(REPO) if path.is_absolute() else path
-        domain_artifacts.append(Artifact(kind=kind, data=data, source=str(rel)))
-
-    artifact_index = ArtifactIndex.from_artifacts(domain_artifacts)
-
-    for kind, path, data in artifacts:
-        rel = path.relative_to(REPO) if path.is_absolute() else path
-        current_artifact = Artifact(kind=kind, data=data, source=str(rel))
-
-        if kind == "DEC":
-            for finding in find_approved_decisions_without_rationale([current_artifact]):
-                fail(finding.code, finding.message, errors)
-            for finding in find_invalid_supersession_successors([current_artifact], artifact_index):
-                fail(finding.code, finding.message, errors)
-            for finding in find_nonreciprocal_decision_supersessions([current_artifact], artifact_index):
-                fail(finding.code, finding.message, errors)
-
-        if kind == "REQ":
-            for finding in find_approved_requirements_without_verification_method([current_artifact]):
-                fail(finding.code, finding.message, errors)
-            for finding in find_invalid_supersession_successors([current_artifact], artifact_index):
-                fail(finding.code, finding.message, errors)
-
-        for finding in find_done_tasks_with_failed_verification([current_artifact]):
-            fail(finding.code, finding.message, errors)
-
-        for finding in find_missing_requirement_references([current_artifact], artifact_index):
-            fail(finding.code, finding.message, errors)
-
-    return errors
+    """Compatibility wrapper around application semantic orchestration."""
+    return [
+        f"{finding.code}: {finding.message}"
+        for finding in application_validate_semantics(_domain_artifacts(artifacts))
+    ]
 
 
 def check_obvious_secrets(errors: list[str]) -> None:
@@ -190,8 +161,8 @@ def main() -> int:
     check_required_files(errors)
     check_schemas(errors)
     artifacts = load_artifacts(errors)
-    check_duplicate_ids(artifacts, errors)
-    errors.extend(validate_semantics(artifacts))
+    for finding in validate_governance_artifacts(_domain_artifacts(artifacts)):
+        fail(finding.code, finding.message, errors)
     check_obvious_secrets(errors)
 
     if errors:
